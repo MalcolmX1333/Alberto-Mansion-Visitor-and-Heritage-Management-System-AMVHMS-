@@ -54,7 +54,7 @@
                                         @csrf
 
                                         <!-- Name Input -->
-                                        <div class="form-group mb-4">
+                                        <div class="form-group mb-3">
                                             <input id="name"
                                                    type="text"
                                                    class="form-control form-control-user @error('name') is-invalid @enderror"
@@ -73,7 +73,7 @@
                                         </div>
 
                                         <!-- Email Input -->
-                                        <div class="form-group mb-4">
+                                        <div class="form-group mb-3">
                                             <input id="email"
                                                    type="email"
                                                    class="form-control form-control-user @error('email') is-invalid @enderror"
@@ -90,8 +90,80 @@
                                             @enderror
                                         </div>
 
+                                        <!-- Address Input -->
+                                        <div class="form-group mb-3">
+                                            <input id="address"
+                                                   type="text"
+                                                   class="form-control form-control-user @error('address') is-invalid @enderror"
+                                                   name="address"
+                                                   value="{{ old('address') }}"
+                                                   required
+                                                   autocomplete="address"
+                                                   placeholder="Address/Affiliation">
+
+                                            @error('address')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Nationality Input -->
+                                        <div class="form-group mb-3">
+                                            <input id="nationality"
+                                                   type="text"
+                                                   class="form-control form-control-user @error('nationality') is-invalid @enderror"
+                                                   name="nationality"
+                                                   value="{{ old('nationality') }}"
+                                                   required
+                                                   autocomplete="nationality"
+                                                   placeholder="Nationality">
+
+                                            @error('nationality')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Gender Input -->
+                                        <div class="form-group mb-3">
+                                            <label class="text-gray-700 mb-2" style="font-size: 0.9rem; margin-left: 1rem;">Gender</label>
+                                            <div class="d-flex justify-content-around" style="padding: 0 1rem;">
+                                                <div class="form-check">
+                                                    <input class="form-check-input @error('gender') is-invalid @enderror"
+                                                           type="radio"
+                                                           name="gender"
+                                                           id="gender_male"
+                                                           value="Male"
+                                                           {{ old('gender') == 'Male' ? 'checked' : '' }}
+                                                           required>
+                                                    <label class="form-check-label" for="gender_male">
+                                                        Male
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input @error('gender') is-invalid @enderror"
+                                                           type="radio"
+                                                           name="gender"
+                                                           id="gender_female"
+                                                           value="Female"
+                                                           {{ old('gender') == 'Female' ? 'checked' : '' }}
+                                                           required>
+                                                    <label class="form-check-label" for="gender_female">
+                                                        Female
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            @error('gender')
+                                            <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+
                                         <!-- Password Input -->
-                                        <div class="form-group mb-4 position-relative">
+                                        <div class="form-group mb-3 position-relative">
                                             <div class="position-relative">
                                                 <input id="password"
                                                        type="password"

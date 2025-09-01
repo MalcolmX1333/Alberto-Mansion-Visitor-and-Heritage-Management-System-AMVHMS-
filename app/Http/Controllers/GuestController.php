@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use MattDaneshvar\Survey\Models\Entry;
 use MattDaneshvar\Survey\Models\Survey;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
+use Psr\Log\LogLevel;
 
 class GuestController extends Controller
 {
@@ -46,11 +48,13 @@ class GuestController extends Controller
             return redirect()->back()->with('error', 'You have already submitted a response today.');
         }
 
+        Log::info($request->all());
+
         // Validate the custom fields and survey data
         $request->validate([
             'registration_type' => 'required|in:Individual,Group',
             'visit_datetime' => 'required|date',
-            'cn_bus_number' => 'required|string',
+            'cn_bus_number' => $request->registration_type === 'Group' ? 'required|string' : 'nullable|string',
             'full_name' => 'required|string',
             'address_affiliation' => 'required|string',
             'nationality' => 'required|string',
@@ -70,11 +74,12 @@ class GuestController extends Controller
         $entry = new Entry();
         $entry->survey_id = $survey->id;
         $entry->device_identifier = $deviceIdentifier;
+        $entry->participant_id = Auth()->check() ? auth()->id() : null;
         $entry->created_at = Carbon::now()->setTimezone('Asia/Manila');
         $entry->updated_at = Carbon::now()->setTimezone('Asia/Manila');
         $entry->save();
 
-        // Save the custom answers manually (assuming question IDs 1-13 for the survey)
+        // Save the custom answers manually
         $entry->answers()->create([
             'question_id' => 1, // Registration Type
             'value' => $request->input('registration_type'),
@@ -85,10 +90,13 @@ class GuestController extends Controller
             'value' => $request->input('visit_datetime'),
         ]);
 
-        $entry->answers()->create([
-            'question_id' => 3, // C.N. Bus Number
-            'value' => $request->input('cn_bus_number'),
-        ]);
+        // Save the C.N. Bus Number only for Group registration
+        if ($request->registration_type === 'Group') {
+            $entry->answers()->create([
+                'question_id' => 3, // C.N. Bus Number
+                'value' => $request->input('cn_bus_number'),
+            ]);
+        }
 
         $entry->answers()->create([
             'question_id' => 4, // Full name
@@ -153,7 +161,7 @@ class GuestController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Survey submitted successfully!');
+        return redirect()->route('landing.page')->with('success', 'Survey submitted successfully!');
     }
 
     protected function survey()

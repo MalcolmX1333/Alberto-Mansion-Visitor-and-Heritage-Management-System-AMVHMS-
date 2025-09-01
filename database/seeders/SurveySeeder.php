@@ -37,7 +37,6 @@ class SurveySeeder extends Seeder
         // Add questions to section one
         $sectionOne->questions()->create([
             'content' => 'C.N. Bus Number',
-            'rules' => ['required']
         ]);
 
         $sectionOne->questions()->create([

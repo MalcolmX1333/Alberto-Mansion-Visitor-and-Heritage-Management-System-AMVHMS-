@@ -90,6 +90,13 @@
             border-color: #27ae60;
             box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
         }
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+        }
+        .form-check-input:disabled + .form-check-label {
+            opacity: 0.6;
+        }
         .btn-primary {
             background: linear-gradient(135deg, #27ae60, #2ecc71);
             border: none;
@@ -124,6 +131,18 @@
         .demographics-section {
             display: none;
         }
+        .bus-number-field {
+            display: none;
+        }
+        .user-info-badge {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -155,44 +174,67 @@
                     </div>
                 @endif
 
+                @if($errors->any())
+                    <div class="alert alert-warning">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="survey-container">
                     <!-- Hidden fields for registration type and visit datetime -->
                     <input type="hidden" name="registration_type" id="registration_type" required>
                     <input type="hidden" name="visit_datetime" id="visit_datetime" required>
 
+                    <!-- User info display for individual registration -->
+                    @auth
+                    <div class="user-info-badge" id="userInfoBadge" style="display: none;">
+                        <i class="fas fa-user mr-2"></i>Using your account information: {{ auth()->user()->name }}
+                    </div>
+                    @endauth
+
                     <h3 class="section-title">
                         <i class="fas fa-user mr-2"></i>Personal Information
                     </h3>
 
-                    <div class="form-group">
+                    <!-- Bus number field - only for groups -->
+                    <div class="form-group bus-number-field">
                         <label for="cn_bus_number">C.N. Bus Number</label>
-                        <input type="text" class="form-control" id="cn_bus_number" name="cn_bus_number" required>
+                        <input type="text" class="form-control" id="cn_bus_number" name="cn_bus_number">
                     </div>
 
                     <div class="form-group">
                         <label for="full_name">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        <input type="text" class="form-control" id="full_name" name="full_name"
+                               value="{{ old('full_name', auth()->check() ? auth()->user()->name : '') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label for="address_affiliation">Address/Affiliation</label>
-                        <input type="text" class="form-control" id="address_affiliation" name="address_affiliation" required>
+                        <input type="text" class="form-control" id="address_affiliation" name="address_affiliation"
+                               value="{{ old('address_affiliation', auth()->check() ? auth()->user()->address : '') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label for="nationality">Nationality</label>
-                        <input type="text" class="form-control" id="nationality" name="nationality" required>
+                        <input type="text" class="form-control" id="nationality" name="nationality"
+                               value="{{ old('nationality', auth()->check() ? auth()->user()->nationality : '') }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Gender</label>
+                        <label>Gender <span class="text-danger">*</span></label>
                         <div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="gender" id="gender_male" value="Male" required>
+                                <input class="form-check-input" type="radio" name="gender" id="gender_male" value="Male"
+                                       {{ old('gender', auth()->check() ? auth()->user()->gender : '') === 'Male' ? 'checked' : '' }} required>
                                 <label class="form-check-label" for="gender_male">Male</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="gender" id="gender_female" value="Female" required>
+                                <input class="form-check-input" type="radio" name="gender" id="gender_female" value="Female"
+                                       {{ old('gender', auth()->check() ? auth()->user()->gender : '') === 'Female' ? 'checked' : '' }} required>
                                 <label class="form-check-label" for="gender_female">Female</label>
                             </div>
                         </div>
@@ -205,42 +247,49 @@
 
                         <div class="form-group">
                             <label for="grade_school_students">No. of Students / Grade School</label>
-                            <input type="number" class="form-control" id="grade_school_students" name="grade_school_students" min="0">
+                            <input type="number" class="form-control" id="grade_school_students" name="grade_school_students"
+                                   value="{{ old('grade_school_students') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="high_school_students">No. of Students / High School</label>
-                            <input type="number" class="form-control" id="high_school_students" name="high_school_students" min="0">
+                            <input type="number" class="form-control" id="high_school_students" name="high_school_students"
+                                   value="{{ old('high_school_students') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="college_students">No. of Students / College / GradSchool</label>
-                            <input type="number" class="form-control" id="college_students" name="college_students" min="0">
+                            <input type="number" class="form-control" id="college_students" name="college_students"
+                                   value="{{ old('college_students') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="pwd">PWD</label>
-                            <input type="text" class="form-control" id="pwd" name="pwd">
+                            <input type="text" class="form-control" id="pwd" name="pwd" value="{{ old('pwd') }}">
                         </div>
 
                         <div class="form-group">
                             <label for="age_17_below">17 y/o and below</label>
-                            <input type="number" class="form-control" id="age_17_below" name="age_17_below" min="0">
+                            <input type="number" class="form-control" id="age_17_below" name="age_17_below"
+                                   value="{{ old('age_17_below') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="age_18_30">18-30 y/o</label>
-                            <input type="number" class="form-control" id="age_18_30" name="age_18_30" min="0">
+                            <input type="number" class="form-control" id="age_18_30" name="age_18_30"
+                                   value="{{ old('age_18_30') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="age_31_45">31-45 y/o</label>
-                            <input type="number" class="form-control" id="age_31_45" name="age_31_45" min="0">
+                            <input type="number" class="form-control" id="age_31_45" name="age_31_45"
+                                   value="{{ old('age_31_45') }}" min="0">
                         </div>
 
                         <div class="form-group">
                             <label for="age_60_above">60 y/o and above</label>
-                            <input type="number" class="form-control" id="age_60_above" name="age_60_above" min="0">
+                            <input type="number" class="form-control" id="age_60_above" name="age_60_above"
+                                   value="{{ old('age_60_above') }}" min="0">
                         </div>
                     </div>
 
@@ -257,6 +306,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+
     // Show registration type selection on page load
     Swal.fire({
         title: 'Registration Type',
@@ -275,25 +326,92 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set the registration type in the hidden field
         document.getElementById('registration_type').value = registrationType;
 
-        // Show/hide demographics section based on registration type
+        // Show/hide sections based on registration type
         let demographicsSection = document.querySelector('.demographics-section');
+        let busNumberField = document.querySelector('.bus-number-field');
         let demographicsInputs = demographicsSection.querySelectorAll('input');
+        let busNumberInput = document.getElementById('cn_bus_number');
+        let userInfoBadge = document.getElementById('userInfoBadge');
+
+        // Get form fields
+        let fullNameInput = document.getElementById('full_name');
+        let addressInput = document.getElementById('address_affiliation');
+        let nationalityInput = document.getElementById('nationality');
+        let genderInputs = document.querySelectorAll('input[name="gender"]');
 
         if (registrationType === 'Individual') {
-            // Hide demographics for Individual registration
+            // Hide demographics and bus number for Individual registration
             demographicsSection.style.display = 'none';
-            // Remove required validation for demographics fields when hidden
+            busNumberField.style.display = 'none';
+
+            // Remove required validation for demographics
             demographicsInputs.forEach(input => {
                 input.removeAttribute('required');
             });
+            busNumberInput.removeAttribute('required');
+
+            // If user is logged in, make personal fields readonly and show badge
+            if (isLoggedIn) {
+                userInfoBadge.style.display = 'block';
+                fullNameInput.setAttribute('readonly', 'readonly');
+                addressInput.setAttribute('readonly', 'readonly');
+                nationalityInput.setAttribute('readonly', 'readonly');
+
+                // Disable gender radio buttons but keep them checked
+                genderInputs.forEach(input => {
+                    if (input.checked) {
+                        input.setAttribute('disabled', 'disabled');
+                        // Add a hidden input to ensure the value is submitted
+                        let hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'gender';
+                        hiddenInput.value = input.value;
+                        input.parentNode.appendChild(hiddenInput);
+                    }
+                });
+            } else {
+                // Clear values and make editable for guests
+                fullNameInput.value = '';
+                addressInput.value = '';
+                nationalityInput.value = '';
+                genderInputs.forEach(input => {
+                    input.checked = false;
+                    input.removeAttribute('disabled');
+                });
+            }
         } else {
-            // Show demographics for Group registration
+            // Show demographics and bus number for Group registration
             demographicsSection.style.display = 'block';
-            // Add required validation for demographics fields when shown
+            busNumberField.style.display = 'block';
+            userInfoBadge.style.display = 'none';
+
+            // Add required validation for demographics
             demographicsInputs.forEach(input => {
                 if (input.type === 'number' || input.name === 'pwd') {
                     input.setAttribute('required', 'required');
                 }
+            });
+            busNumberInput.setAttribute('required', 'required');
+
+            // Make personal fields editable regardless of login status
+            fullNameInput.removeAttribute('readonly');
+            addressInput.removeAttribute('readonly');
+            nationalityInput.removeAttribute('readonly');
+
+            // Enable gender radio buttons and remove hidden inputs
+            genderInputs.forEach(input => {
+                input.removeAttribute('disabled');
+                // Remove any hidden gender inputs from previous individual selection
+                let hiddenInputs = input.parentNode.querySelectorAll('input[type="hidden"][name="gender"]');
+                hiddenInputs.forEach(hidden => hidden.remove());
+            });
+
+            // Clear pre-filled values for group registration
+            fullNameInput.value = '';
+            addressInput.value = '';
+            nationalityInput.value = '';
+            genderInputs.forEach(input => {
+                input.checked = false;
             });
         }
 
