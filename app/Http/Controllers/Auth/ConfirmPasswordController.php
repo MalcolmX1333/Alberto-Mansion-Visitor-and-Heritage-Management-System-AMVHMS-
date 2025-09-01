@@ -7,17 +7,6 @@ use Illuminate\Foundation\Auth\ConfirmsPasswords;
 
 class ConfirmPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Confirm Password Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password confirmations and
-    | uses a simple trait to include the behavior. You're free to explore
-    | this trait and override any functions that require customization.
-    |
-    */
-
     use ConfirmsPasswords;
 
     /**
@@ -26,6 +15,20 @@ class ConfirmPasswordController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    /**
+     * Get the redirect path based on user role.
+     *
+     * @return string
+     */
+    public function redirectTo()
+    {
+        if (auth()->user()->hasRole('Admin')) {
+            return '/home';
+        }
+
+        return '/';
+    }
 
     /**
      * Create a new controller instance.

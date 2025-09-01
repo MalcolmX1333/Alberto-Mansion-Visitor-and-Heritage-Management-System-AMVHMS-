@@ -37,7 +37,6 @@
                                 ">
                                     <span style="color: white;">BCHATO: Preserving the</span> <br>
                                     <span style="color: white;">Heritage, Boosting Tourism</span> <br>
-{{--                                    <span style="color: #007A33;">where the past meets the future</span>--}}
                                 </div>
                             </div>
 
@@ -124,11 +123,14 @@
                                         <hr class="mb-4">
                                     </form>
 
-                                    <!-- Forgot Password Link -->
+                                    <!-- Forgot Password and Register Links -->
                                     <div class="text-center">
                                         @if (Route::has('password.request'))
                                             <a class="small" href="{{ route('password.request') }}">Forgot Password?</a>
                                         @endif
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small" href="{{ route('register') }}">Create an Account!</a>
                                     </div>
                                 </div>
                             </div>
@@ -138,6 +140,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // Toggle Password Visibility
@@ -147,6 +150,19 @@
             passwordInput.setAttribute('type', passwordType);
             this.classList.toggle('fa-eye-slash');
         });
+
+        @if(session('survey_redirect'))
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Authentication Required',
+                text: 'Please login first before accessing the visitor survey.',
+                icon: 'info',
+                confirmButtonText: 'Okay',
+                confirmButtonColor: '#27ae60',
+                allowOutsideClick: false
+            });
+        });
+        @endif
     </script>
     </body>
 @endsection

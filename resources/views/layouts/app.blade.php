@@ -196,6 +196,17 @@ r -->
     });
     @endif
 
+    @if (session('info'))
+    Swal.fire({
+        icon: 'info',
+        title: 'Info',
+        text: '{{ session('info') }}',
+        timer: 3000,
+        showConfirmButton: false
+    });
+    @endif
+
+
     @if (session('error'))
     Swal.fire({
         icon: 'error',

@@ -10,17 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
     /**
@@ -29,6 +18,20 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    /**
+     * Get the post-registration redirect path based on user role.
+     *
+     * @return string
+     */
+    public function redirectTo()
+    {
+        if (auth()->user()->hasRole('Admin')) {
+            return '/home';
+        }
+
+        return '/';
+    }
 
     /**
      * Create a new controller instance.

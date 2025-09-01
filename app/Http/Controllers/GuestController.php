@@ -11,11 +11,18 @@ use Illuminate\Support\Facades\Cookie;
 
 class GuestController extends Controller
 {
-    public function create()
-    {
-        $survey = Survey::where('name', 'Visitor Information')->first();
-        return view('survey.guest', ['survey' => $survey]);
-    }
+   public function create()
+   {
+       $survey = Survey::where('name', 'Visitor Information')->first();
+
+       // Check if user was redirected from login after authentication
+       if (session('survey_redirect')) {
+           session()->forget('survey_redirect'); // Clear the session flag
+           return view('survey.guest', ['survey' => $survey, 'show_welcome_swal' => true]);
+       }
+
+       return view('survey.guest', ['survey' => $survey]);
+   }
 
     public function store(Request $request)
     {

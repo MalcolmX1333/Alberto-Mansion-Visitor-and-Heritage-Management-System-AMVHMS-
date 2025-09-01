@@ -17,7 +17,7 @@ Auth::routes();
 
 Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
-Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/age-demographics', [HomeController::class, 'ageDemographics'])->name('age-demographics');
@@ -27,8 +27,11 @@ Route::get('/most-visited-today', [HomeController::class, 'visitToday'])->name('
 Route::get('/most-visited-month', [HomeController::class, 'visitThisMonth'])->name('most-visited-month');
 Route::get('/student-demographics', [HomeController::class, 'studentDemographics'])->name('student-demographics');
 
-Route::get('/guest-survey', [GuestController::class, 'create'])->name('guest.survey.create');
-Route::post('/guest-survey', [GuestController::class, 'store'])->name('guest.survey.store');
+Route::middleware(['guest.survey.auth'])->group(function () {
+    Route::get('/guest-survey', [GuestController::class, 'create'])->name('guest.survey.create');
+    Route::post('/guest-survey', [GuestController::class, 'store'])->name('guest.survey.store');
+});
+
 
 
 Route::get('/visitor/index', [VisitorInformationController::class, 'index'])->name('visitor.index');
