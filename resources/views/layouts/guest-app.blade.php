@@ -26,7 +26,6 @@
 
 </head>
 <body>
-
 <header id="header" id="home">
     <div class="container header-top">
         <div class="row">
@@ -37,7 +36,31 @@
             </div>
             <div class="col-6 top-head-right">
                 <ul>
-                    <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                    @auth
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-user-circle"></i> {{ Auth::user()->name }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fa fa-user"></i> Profile
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fa fa-calendar"></i> Reservations
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="fa fa-sign-out"></i> Logout
+                                </a>
+                                <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                                    @csrf
+                                </form>
+                            </div>
+                        </li>
+                    @else
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('login') }}">Sign Up</a></li>
+                    @endauth
                 </ul>
             </div>
         </div>
