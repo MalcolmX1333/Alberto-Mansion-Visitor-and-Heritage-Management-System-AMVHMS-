@@ -144,12 +144,16 @@
                     </div>
                 </div>
             </div>
+
+
+            @guest()
             <div class="col-lg-2 col-md-6 col-sm-6">
                 <div class="single-footer-widget">
                     <h6>Links</h6>
                     <a href="{{route('login')}}" class="btn btn-primary">Login</a>
                 </div>
             </div>
+            @endguest
         </div>
     </div>
 </footer>

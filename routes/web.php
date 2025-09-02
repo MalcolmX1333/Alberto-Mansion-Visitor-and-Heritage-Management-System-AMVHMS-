@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [LandingPageController::class, 'index'])->name('landing.page');
 Auth::routes();
 
+// Instead of /create/{id}/qr-code, try:
+Route::get('/reservation/{id}/qr-code', [App\Http\Controllers\QRController::class, 'generateQrCode'])->name('generate.qr');
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -48,4 +50,7 @@ Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.e
 Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
 
-Route::resource('reservation', ReservationController::class);
+Route::get('/guest/reservations', [ReservationController::class, 'index'])->name('guest.reservation.index');
+Route::get('/guest/reservation/{id}/details', [ReservationController::class, 'details'])->name('guest.reservation.details');
+Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'])->name('guest.reservation.edit');
+
