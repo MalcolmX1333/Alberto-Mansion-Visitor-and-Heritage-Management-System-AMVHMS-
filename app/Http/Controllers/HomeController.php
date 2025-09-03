@@ -28,196 +28,202 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $visitToday = $this->visitToday();
-        $visitMonth = $this->visitThisMonth();
+        // Get visits today and this month (only visited entries)
+        $visitToday = Entry::where('isVisited', true)
+            ->whereDate('entries.created_at', today())
+            ->count();
+
+        $visitMonth = Entry::where('isVisited', true)
+            ->whereMonth('entries.created_at', now()->month)
+            ->whereYear('entries.created_at', now()->year)
+            ->count();
+
         return view('home', compact('visitToday', 'visitMonth'));
     }
 
-    // app/Http/Controllers/HomeController.php
-
     public function ageDemographics(Request $request)
     {
-        $filter = $request->input('filter', 'today');
+        $filter = $request->get('filter', 'week');
+        $dateFilter = $this->getDateFilter($filter);
 
-        $seventeenQuery = Answer::where('question_id', 11);
-        $thirtyQuery = Answer::where('question_id', 12);
-        $fortyfiveQuery = Answer::where('question_id', 13);
-        $sixtyQuery = Answer::where('question_id', 14);
+        // Get age demographics from visited entries only
+        $entries = Entry::select('entries.*', 'answers.value', 'questions.content')
+            ->join('answers', 'entries.id', '=', 'answers.entry_id')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->where('entries.isVisited', true)
+            ->where('entries.created_at', '>=', $dateFilter)
+            ->whereIn('questions.content', ['Registration Type', '17 y/o and below', '18-30 y/o', '31-45 y/o', '60 y/o and above'])
+            ->get();
 
-        switch ($filter) {
-            case 'week':
-                $seventeenQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $thirtyQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $fortyfiveQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $sixtyQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                break;
-            case 'month':
-                $seventeenQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $thirtyQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $fortyfiveQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $sixtyQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'year':
-                $seventeenQuery->whereYear('created_at', Carbon::now()->year);
-                $thirtyQuery->whereYear('created_at', Carbon::now()->year);
-                $fortyfiveQuery->whereYear('created_at', Carbon::now()->year);
-                $sixtyQuery->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'today':
-            default:
-                $seventeenQuery->whereDate('created_at', Carbon::today());
-                $thirtyQuery->whereDate('created_at', Carbon::today());
-                $fortyfiveQuery->whereDate('created_at', Carbon::today());
-                $sixtyQuery->whereDate('created_at', Carbon::today());
-                break;
+        $ageCounts = [
+            'seventeen' => 0,
+            'thirty' => 0,
+            'fortyfive' => 0,
+            'sixty' => 0
+        ];
+
+        // Group entries by entry ID
+        $groupedEntries = $entries->groupBy('id');
+
+        foreach ($groupedEntries as $entryId => $entryAnswers) {
+            $registrationType = null;
+            $ageData = [];
+
+            foreach ($entryAnswers as $answer) {
+                if ($answer->content === 'Registration Type') {
+                    $registrationType = $answer->value;
+                } else {
+                    $ageData[$answer->content] = (int)$answer->value;
+                }
+            }
+
+            if ($registrationType === 'Individual') {
+                // For individual, increment all age groups by 1
+                $ageCounts['seventeen'] += 1;
+                $ageCounts['thirty'] += 1;
+                $ageCounts['fortyfive'] += 1;
+                $ageCounts['sixty'] += 1;
+            } else {
+                // For groups, use the actual counts
+                $ageCounts['seventeen'] += $ageData['17 y/o and below'] ?? 0;
+                $ageCounts['thirty'] += $ageData['18-30 y/o'] ?? 0;
+                $ageCounts['fortyfive'] += $ageData['31-45 y/o'] ?? 0;
+                $ageCounts['sixty'] += $ageData['60 y/o and above'] ?? 0;
+            }
         }
 
-        $seventeen = $seventeenQuery->selectRaw('SUM(value) as seventeen')->first();
-        $thirty = $thirtyQuery->selectRaw('SUM(value) as thirty')->first();
-        $fortyfive = $fortyfiveQuery->selectRaw('SUM(value) as fortyfive')->first();
-        $sixty = $sixtyQuery->selectRaw('SUM(value) as sixty')->first();
-
-        return response()->json([
-            'seventeen' => $seventeen->seventeen,
-            'thirty' => $thirty->thirty,
-            'fortyfive' => $fortyfive->fortyfive,
-            'sixty' => $sixty->sixty,
-        ]);
-    }
-
-    public function studentDemographics(Request $request)
-    {
-        $filter = $request->input('filter', 'today');
-
-        $gradeSchoolQuery = Answer::where('question_id', 7);
-        $highSchoolQuery = Answer::where('question_id', 8);
-        $collegeQuery = Answer::where('question_id', 9);
-
-        switch ($filter) {
-            case 'week':
-                $gradeSchoolQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $highSchoolQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $collegeQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                break;
-            case 'month':
-                $gradeSchoolQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $highSchoolQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $collegeQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'year':
-                $gradeSchoolQuery->whereYear('created_at', Carbon::now()->year);
-                $highSchoolQuery->whereYear('created_at', Carbon::now()->year);
-                $collegeQuery->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'today':
-            default:
-                $gradeSchoolQuery->whereDate('created_at', Carbon::today());
-                $highSchoolQuery->whereDate('created_at', Carbon::today());
-                $collegeQuery->whereDate('created_at', Carbon::today());
-                break;
-        }
-
-        $gradeSchool = $gradeSchoolQuery->selectRaw('SUM(value) as gradeSchool')->first();
-        $highSchool = $highSchoolQuery->selectRaw('SUM(value) as highSchool')->first();
-        $college = $collegeQuery->selectRaw('SUM(value) as college')->first();
-
-        return response()->json([
-            'gradeSchool' => $gradeSchool->gradeSchool,
-            'highSchool' => $highSchool->highSchool,
-            'college' => $college->college,
-        ]);
+        return response()->json($ageCounts);
     }
 
     public function genderDemographics(Request $request)
     {
-        $filter = $request->input('filter', 'today');
+        $filter = $request->get('filter', 'week');
+        $dateFilter = $this->getDateFilter($filter);
 
-        $maleQuery = Answer::where('question_id', 5);
-        $femaleQuery = Answer::where('question_id', 6);
+        // Get gender demographics from visited entries only
+        $genderCounts = Entry::select('answers.value as gender', DB::raw('count(*) as count'))
+            ->join('answers', 'entries.id', '=', 'answers.entry_id')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->where('entries.isVisited', true)
+            ->where('entries.created_at', '>=', $dateFilter)
+            ->where('questions.content', 'Gender')
+            ->groupBy('answers.value')
+            ->get();
 
-        switch ($filter) {
-            case 'week':
-                $maleQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                $femaleQuery->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                break;
-            case 'month':
-                $maleQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                $femaleQuery->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'year':
-                $maleQuery->whereYear('created_at', Carbon::now()->year);
-                $femaleQuery->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'today':
-            default:
-                $maleQuery->whereDate('created_at', Carbon::today());
-                $femaleQuery->whereDate('created_at', Carbon::today());
-                break;
+        return response()->json($genderCounts);
+    }
+
+    public function studentDemographics(Request $request)
+    {
+        $filter = $request->get('filter', 'week');
+        $dateFilter = $this->getDateFilter($filter);
+
+        // Get student demographics from visited group entries only
+        $entries = Entry::select('entries.*', 'answers.value', 'questions.content')
+            ->join('answers', 'entries.id', '=', 'answers.entry_id')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->where('entries.isVisited', true)
+            ->where('entries.created_at', '>=', $dateFilter)
+            ->whereIn('questions.content', [
+                'Registration Type',
+                'No. of Students / Grade School',
+                'No. of Students / High School',
+                'No. of Students / College / GradSchool'
+            ])
+            ->get();
+
+        $studentCounts = [
+            'gradeSchool' => 0,
+            'highSchool' => 0,
+            'college' => 0
+        ];
+
+        // Group entries by entry ID
+        $groupedEntries = $entries->groupBy('id');
+
+        foreach ($groupedEntries as $entryId => $entryAnswers) {
+            $registrationType = null;
+            $studentData = [];
+
+            foreach ($entryAnswers as $answer) {
+                if ($answer->content === 'Registration Type') {
+                    $registrationType = $answer->value;
+                } else {
+                    $studentData[$answer->content] = (int)$answer->value;
+                }
+            }
+
+            // Only count students from Group registrations
+            if ($registrationType === 'Group') {
+                $studentCounts['gradeSchool'] += $studentData['No. of Students / Grade School'] ?? 0;
+                $studentCounts['highSchool'] += $studentData['No. of Students / High School'] ?? 0;
+                $studentCounts['college'] += $studentData['No. of Students / College / GradSchool'] ?? 0;
+            }
         }
 
-        $maleSum = $maleQuery->selectRaw('SUM(value) as total')->first()->total;
-        $femaleSum = $femaleQuery->selectRaw('SUM(value) as total')->first()->total;
-
-        return response()->json([
-            ['gender' => 'Female', 'count' => $femaleSum],
-            ['gender' => 'Male', 'count' => $maleSum],
-        ]);
+        return response()->json($studentCounts);
     }
 
     public function mostVisited(Request $request)
     {
-        $filter = $request->input('filter', 'today');
-        $query = Entry::selectRaw('DAYNAME(created_at) as day, COUNT(DISTINCT device_identifier) as visits')
-            ->groupBy('day')
-            ->orderBy(DB::raw('FIELD(day, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")'));
+        $filter = $request->get('filter', 'week');
+        $dateFilter = $this->getDateFilter($filter);
 
-        switch ($filter) {
-            case 'week':
-                $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                break;
-            case 'month':
-                $query->whereMonth('created_at', Carbon::now()->month)
-                    ->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'year':
-                $query->whereYear('created_at', Carbon::now()->year);
-                break;
-            case 'today':
-            default:
-                $query->whereDate('created_at', Carbon::today());
-                break;
-        }
+        // Get most visited days from visited entries only
+        $visitData = Entry::where('isVisited', true)
+            ->where('entries.created_at', '>=', $dateFilter)
+            ->select(DB::raw('DAYNAME(entries.created_at) as day'), DB::raw('count(*) as visits'))
+            ->groupBy(DB::raw('DAYNAME(entries.created_at)'))
+            ->orderBy('visits', 'desc')
+            ->get();
 
-        $entriesByDay = $query->get();
-
-        return response()->json($entriesByDay);
+        return response()->json($visitData);
     }
 
     public function visitToday()
     {
-        return Entry::whereDate('created_at', Carbon::today())
-            ->distinct('device_identifier')
-            ->count('device_identifier');
+        // Get visits today (only visited entries)
+        $visitToday = Entry::where('isVisited', true)
+            ->whereDate('entries.created_at', today())
+            ->count();
+
+        return response()->json(['visitToday' => $visitToday]);
     }
 
     public function visitThisMonth()
     {
-        return Entry::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->distinct('device_identifier')
-            ->count('device_identifier');
+        // Get visits this month (only visited entries)
+        $visitMonth = Entry::where('isVisited', true)
+            ->whereMonth('entries.created_at', now()->month)
+            ->whereYear('entries.created_at', now()->year)
+            ->count();
+
+        return response()->json(['visitMonth' => $visitMonth]);
     }
 
+    private function getDateFilter($filter)
+    {
+        switch ($filter) {
+            case 'today':
+                return today();
+            case 'week':
+                return now()->startOfWeek();
+            case 'month':
+                return now()->startOfMonth();
+            case 'year':
+                return now()->startOfYear();
+            default:
+                return now()->startOfWeek();
+        }
+    }
 
+    private function getAnswerValue($entry, $questionContent)
+    {
+        $answer = $entry->answers()
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->where('questions.content', $questionContent)
+            ->first();
 
-
+        return $answer ? $answer->value : null;
+    }
 }

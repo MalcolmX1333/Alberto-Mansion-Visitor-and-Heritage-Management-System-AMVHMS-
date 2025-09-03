@@ -42,10 +42,10 @@
                                 <i class="fa fa-user-circle"></i> {{ Auth::user()->name }}
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="">
                                     <i class="fa fa-user"></i> Profile
                                 </a>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{route('guest.reservation.index')}}">
                                     <i class="fa fa-calendar"></i> Reservations
                                 </a>
                                 <div class="dropdown-divider"></div>

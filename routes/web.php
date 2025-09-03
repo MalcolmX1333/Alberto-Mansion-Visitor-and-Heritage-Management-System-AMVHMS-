@@ -54,3 +54,4 @@ Route::get('/guest/reservations', [ReservationController::class, 'index'])->name
 Route::get('/guest/reservation/{id}/details', [ReservationController::class, 'details'])->name('guest.reservation.details');
 Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'])->name('guest.reservation.edit');
 
+Route::get('/registration-type-demographics', [HomeController::class, 'registrationTypeDemographics'])->name('registration.type.demographics');
