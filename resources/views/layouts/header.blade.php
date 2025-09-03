@@ -13,8 +13,8 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
-        <li class="menu-item">
-            <a href="#" class="menu-link">
+        <li class="menu-item {{ request()->routeIs('home') ? ' active' : '' }}">
+            <a href="{{route('home')}}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
             </a>
@@ -24,12 +24,12 @@
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Interface</span></li>
 
         <!-- Visitor Information -->
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user"></i>
-                <div data-i18n="Visitor Information">Visitor Information</div>
-            </a>
-        </li>
+    <li class="menu-item {{ request()->routeIs('admin.reservation.index') ? ' active' : '' }}">
+        <a href="{{route('admin.reservation.index')}}" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-user"></i>
+            <div data-i18n="Visitor Information">Visitor Reservations</div>
+        </a>
+    </li>
 
         <!-- Reports -->
         <li class="menu-item">

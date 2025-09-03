@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminReservationController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\HomeController;
@@ -32,7 +33,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/visitor/demographics/{entryId}', [VisitorInformationController::class, 'view'])->name('visitor.demographics');
 
-
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/reservations', [AdminReservationController::class, 'index'])->name('reservation.index');
+        Route::get('/reservations/{id}/details', [AdminReservationController::class, 'details'])->name('reservation.details');
+        Route::put('/reservations/{id}/status', [AdminReservationController::class, 'updateStatus'])->name('reservation.update-status');
+        Route::delete('/reservations/{id}', [AdminReservationController::class, 'destroy'])->name('reservation.destroy');
+        Route::get('/reservations/{id}/qr', [AdminReservationController::class, 'generateQR'])->name('reservation.qr');
+        Route::get('/reservations/search', [AdminReservationController::class, 'search'])->name('reservation.search');
+        Route::get('/mark-visited/{id}', [AdminReservationController::class, 'markVisited'])->name('reservation.mark-visited');
+    });
 });
 
 Route::middleware(['guest.survey.auth'])->group(function () {
