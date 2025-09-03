@@ -75,6 +75,7 @@ class GuestController extends Controller
         $entry->survey_id = $survey->id;
         $entry->device_identifier = $deviceIdentifier;
         $entry->participant_id = Auth()->check() ? auth()->id() : null;
+        $entry->registration_type = $request->input('registration_type') === 'Group' ? 1 : 0; // Convert to boolean
         $entry->created_at = Carbon::now()->setTimezone('Asia/Manila');
         $entry->updated_at = Carbon::now()->setTimezone('Asia/Manila');
         $entry->save();
