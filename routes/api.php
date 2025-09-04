@@ -9,4 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::get('visits/{id}/mark-visited', [VisitController::class, 'markVisited'])->name('api.visits.mark-visited');
+//Route::get('visits/{id}/mark-visited', [VisitController::class, 'markVisited'])->name('api.visits.mark-visited');

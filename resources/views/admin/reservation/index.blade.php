@@ -10,6 +10,9 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                            <button class="btn btn-primary btn-sm" onclick="openQRScanner()">
+                                <i class="fas fa-camera me-1"></i> Scan QR
+                            </button>
                             <button class="btn btn-success btn-sm" onclick="refreshTable()">
                                 <i class="fas fa-sync me-1"></i> Refresh
                             </button>
@@ -78,6 +81,27 @@
             </div>
         </div>
     </div>
+
+    <!-- QR Scanner Modal -->
+    <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrScannerModalLabel">
+                        <i class="fas fa-camera me-2"></i>QR Code Scanner
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="qr-reader" style="width: 100%;"></div>
+                    <div id="qr-reader-results" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('styles')
@@ -138,6 +162,37 @@
             background: #555;
         }
 
+        /* QR Scanner Styles */
+        #qr-reader {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+
+        #qr-reader__camera_selection {
+            margin-bottom: 1rem;
+        }
+
+        #qr-reader__scan_region {
+            margin: 0 auto;
+        }
+
+        #qr-reader__dashboard {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .qr-success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .qr-error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .table td, .table th {
                 padding: 0.5rem;
@@ -158,6 +213,10 @@
             .btn-group .btn {
                 padding: 0.25rem 0.4rem;
                 font-size: 0.75rem;
+            }
+
+            #qr-reader {
+                max-width: 100%;
             }
         }
 
@@ -191,8 +250,11 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <script>
+        let html5QrcodeScanner = null;
+
         $(document).ready(function() {
             var table = $('#reservationsTable').DataTable({
                 pageLength: 25,
@@ -228,14 +290,101 @@
                     table.columns.adjust();
                 }, 250);
             });
+
+            // Clean up scanner when modal is closed
+            $('#qrScannerModal').on('hidden.bs.modal', function () {
+                stopQRScanner();
+            });
         });
+
+        window.openQRScanner = function() {
+            const modal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+            modal.show();
+
+            setTimeout(() => {
+                startQRScanner();
+            }, 500); // Delay to ensure modal is fully shown
+        }
+
+        function startQRScanner() {
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                {
+                    fps: 10,
+                    qrbox: 250,
+                    aspectRatio: 1.0
+                },
+                false
+            );
+
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
+
+        function stopQRScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(error => {
+                    console.error("Failed to clear QR scanner.", error);
+                });
+                html5QrcodeScanner = null;
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Stop scanning
+            stopQRScanner();
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('qrScannerModal'));
+            modal.hide();
+
+            // Check if the scanned URL is a visit marking URL
+            if (decodedText.includes('/api/visits/') && decodedText.includes('/mark-visited')) {
+                // Extract ID from URL
+                const urlParts = decodedText.split('/');
+                const idIndex = urlParts.indexOf('visits') + 1;
+                const id = urlParts[idIndex];
+
+                if (id) {
+                    Swal.fire({
+                        title: 'QR Code Scanned!',
+                        text: `Found reservation ID: ${id}. Mark as visited?`,
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, mark as visited!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect to the scanned URL
+                            window.open(decodedText, '_blank');
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid QR Code',
+                        text: 'Could not extract reservation ID from QR code.'
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Unrecognized QR Code',
+                    text: 'This QR code is not a valid reservation visit link.'
+                });
+            }
+        }
+
+        function onScanFailure(error) {
+            // Handle scan failure, usually better to ignore it
+            console.warn(`QR scan error: ${error}`);
+        }
 
         window.refreshTable = function() {
             location.reload();
         }
 
         window.generateQR = function(id) {
-            // Use the same QR generation route as guest blade
             const url = "{{ route('generate.qr', ':id') }}".replace(':id', id);
 
             Swal.fire({

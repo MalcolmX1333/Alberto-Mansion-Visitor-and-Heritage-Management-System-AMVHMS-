@@ -64,3 +64,13 @@ Route::get('/guest/reservation/{id}/details', [ReservationController::class, 'de
 Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'])->name('guest.reservation.edit');
 
 Route::get('/registration-type-demographics', [HomeController::class, 'registrationTypeDemographics'])->name('registration.type.demographics');
+
+
+Route::get('/visit/unauthorized', function () {
+    return view('layouts.partials.unauthorizedVisit');
+})->name('visit.unauthorized');
+
+
+Route::get('api/visits/{id}/mark-visited', [App\Http\Controllers\Api\VisitController::class, 'markVisited'])
+    ->name('api.visits.mark-visited')
+    ->middleware(['auth', 'role:Admin']);

@@ -11,39 +11,34 @@ class VisitController extends Controller
     public function markVisited($id)
     {
         \Log::info((Entry::findOrFail($id))->toArray());
+        \Log::info("Admin user ID " . auth()->id() . " attempting to mark entry {$id} as visited");
 
         try {
-            // Find the entry using the Entry model
             $entry = Entry::findOrFail($id);
 
-            // Check if already visited to avoid duplicate processing
             if ($entry->isVisited) {
-                return view('layouts.partials.successVisit')->with([
-                    'message' => 'This reservation was already marked as visited.',
+                \Log::info("Entry {$id} was already marked as visited");
+                return redirect()->route('admin.reservation.index')->with([
+                    'warning' => 'This reservation was already marked as visited.',
                     'entry' => $entry
                 ]);
             }
 
-            // Update the isVisited status using the model
             $entry->isVisited = true;
             $entry->save();
 
-            \Log::info("Entry {$id} marked as visited successfully");
+            \Log::info("Entry {$id} marked as visited successfully by admin user ID " . auth()->id());
 
-            // Redirect to success page instead of returning JSON
-            return view('layouts.partials.successVisit')->with([
-                'message' => 'Reservation marked as visited successfully',
+            return redirect()->route('admin.reservation.index')->with([
+                'success' => 'Reservation marked as visited successfully!',
                 'entry' => $entry
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Error marking entry {$id} as visited: " . $e->getMessage());
+            \Log::error("Error marking entry {$id} as visited by user ID " . auth()->id() . ": " . $e->getMessage());
 
-            // Return error view or redirect to error page
-            return view('layouts.partials.successVisit')->with([
-                'error' => true,
-                'message' => 'Reservation not found or could not be updated',
-                'entry' => null
+            return redirect()->route('admin.reservation.index')->with([
+                'error' => 'Reservation not found or could not be updated'
             ]);
         }
     }
