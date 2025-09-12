@@ -28,21 +28,24 @@ class GuestController extends Controller
 
     public function store(Request $request)
     {
-        $survey = $this->survey();
+
         $deviceIdentifier = Cookie::get('device_identifier');
 
-        // If the cookie does not exist, create a new unique identifier
-        if (!$deviceIdentifier) {
-            $deviceIdentifier = $request->ip() . '-' . Str::random(40);
-            $expiresAt = Carbon::now()->setTimezone('Asia/Manila')->endOfDay();
-            Cookie::queue('device_identifier', $deviceIdentifier, $expiresAt->diffInMinutes());
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to submit the survey.');
         }
+
+        $survey = $this->survey();
+        $participantId = auth()->id();
 
         // Check if the user has already submitted a response today
         $existingEntry = Entry::where('survey_id', $survey->id)
-            ->where('device_identifier', $deviceIdentifier)
+            ->where('participant_id', $participantId)
             ->whereDate('created_at', Carbon::today())
             ->first();
+
+
+        Log::info($existingEntry);
 
         if ($existingEntry) {
             return redirect()->back()->with('error', 'You have already submitted a response today.');

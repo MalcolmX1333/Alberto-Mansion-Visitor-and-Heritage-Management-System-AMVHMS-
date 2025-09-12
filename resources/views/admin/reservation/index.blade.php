@@ -25,8 +25,8 @@
                     <table class="table table-hover align-middle nowrap" id="reservationsTable" width="100%" cellspacing="0">
                         <thead class="table-light">
                             <tr>
-                                <th>ID</th>
-                                <th>Survey</th>
+{{--                                <th>ID</th>--}}
+{{--                                <th>Survey</th>--}}
                                 <th>Visit Date</th>
                                 <th class="text-center">Type</th>
                                 <th>Full Name</th>
@@ -34,29 +34,42 @@
                                 <th>Email</th>
                                 <th class="text-center">Status</th>
                                 <th>Created At</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach($reservations as $reservation)
                             <tr>
-                                <td>{{ $reservation['id'] }}</td>
-                                <td>{{ $reservation['survey_name'] }}</td>
-                                <td>{{ $reservation['visit_date'] }}</td>
+{{--                                <td>{{ $reservation['id'] ?? '-'}}</td>--}}
+{{--                                <td>{{ $reservation['survey_name'] ?? '-'}}</td>--}}
+                                <td>{{ $reservation['visit_date'] ?? '-'}}</td>
                                 <td class="text-center">
                                     <span class="badge bg-primary">{{ $reservation['registration_type'] }}</span>
                                 </td>
-                                <td>{{ $reservation['full_name'] }}</td>
-                                <td>{{ $reservation['participant_name'] }}</td>
-                                <td>{{ $reservation['participant_email'] }}</td>
+                                <td>{{ $reservation['full_name'] ?? '-'}}</td>
+                                <td>{{ $reservation['participant_name'] ?? '-'}}</td>
+                                <td>{{ $reservation['participant_email'] ?? '-'}}</td>
                                 <td class="text-center">
                                     @if($reservation['status'] === 'Visited')
-                                        <span class="badge bg-success">{{ $reservation['status'] }}</span>
+                                        <span class="badge bg-success">{{ $reservation['status'] ?? '-'}}</span>
                                     @else
-                                        <span class="badge bg-warning">{{ $reservation['status'] }}</span>
+                                        <span class="badge bg-warning">{{ $reservation['status'] ?? '-'}}</span>
                                     @endif
                                 </td>
-                                <td>{{ $reservation['created_at'] }}</td>
+                                <td>{{ $reservation['created_at'] ?? '-'}}</td>
+                                <td>
+                                    {{ $reservation['time_in'] ?? '-' }}
+                                </td>
+                                <td>
+                                @if($reservation['time_in'])
+                                    {{ $reservation['time_out'] ?? '-' }}
+                                @else
+                                    -
+                                @endif
+                                </td>
+
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <button class="btn btn-info btn-sm" title="View Details" onclick="viewDetails({{ $reservation['id'] }})">
@@ -506,6 +519,24 @@
                                     <div class="col-6">${data.reservation.demographics.age_60_above || '0'}</div>
                                 </div>
                             `;
+                        }
+
+                        // Add feedback answers if present
+                        if (data.reservation.feedback_answers && data.reservation.feedback_answers.length > 0) {
+                            detailsHtml += `
+                                <hr class="my-3">
+                                <h5 class="mb-3 text-success">Feedback Answers</h5>
+                                <div class="mb-2">
+                            `;
+                            data.reservation.feedback_answers.forEach(function(answer) {
+                                detailsHtml += `
+                                    <div class="row mb-1">
+                                        <div class="col-6"><strong>${answer.question}:</strong></div>
+                                        <div class="col-6">${answer.value}</div>
+                                    </div>
+                                `;
+                            });
+                            detailsHtml += `</div>`;
                         }
 
                         detailsHtml += `

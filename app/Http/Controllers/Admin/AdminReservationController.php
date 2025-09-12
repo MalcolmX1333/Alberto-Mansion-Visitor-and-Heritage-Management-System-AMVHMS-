@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use MattDaneshvar\Survey\Models\Entry;
 use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -12,25 +13,55 @@ class AdminReservationController extends Controller
 {
     public function index()
     {
-        // Fetch all survey entries with related data
-        $reservations = Entry::with(['survey', 'answers.question', 'participant'])
-            ->whereHas('answers.question') // Only entries with valid questions
-            ->get()
-            ->map(function ($entry) {
-                return [
-                    'id' => $entry->id,
-                    'survey_name' => $entry->survey->name,
-                    'visit_date' => $this->getAnswerValue($entry, 'Visit Date and Time'),
-                    'registration_type' => $this->getAnswerValue($entry, 'Registration Type'),
-                    'full_name' => $this->getAnswerValue($entry, 'Full name'),
-                    'participant_name' => $entry->participant ? $entry->participant->name : 'Guest',
-                    'participant_email' => $entry->participant ? $entry->participant->email : '-',
-                    'created_at' => $entry->created_at->format('Y-m-d H:i:s'),
-                    'status' => $entry->isVisited ? 'Visited' : 'Pending'
-                ];
-            });
+        // Get reservations with time_in and time_out data
+        $reservations = $this->getReservationsWithTimeTracking();
 
         return view('admin.reservation.index', compact('reservations'));
+    }
+
+    private function getReservationsWithTimeTracking()
+    {
+        $reservations = DB::select("
+        SELECT
+            e1.id,
+            s.name as survey_name,
+            e1.participant_id,
+            e1.created_at,
+            e1.updated_at,
+            e1.isVisited,
+            CASE
+                WHEN e1.isVisited = 1 THEN e1.updated_at
+                ELSE NULL
+            END as time_in,
+            e2.created_at as time_out,
+            e2.id as feedback_entry_id
+        FROM entries e1
+        LEFT JOIN surveys s ON e1.survey_id = s.id
+        LEFT JOIN entries e2 ON e1.participant_id = e2.participant_id
+            AND e2.survey_id = 2
+        WHERE e1.survey_id = 1
+        ORDER BY e1.created_at DESC
+    ");
+
+        return collect($reservations)->map(function ($reservation) {
+            $entry = Entry::with(['survey', 'answers.question', 'participant'])
+                ->find($reservation->id);
+
+            return [
+                'id' => $reservation->id,
+                'survey_name' => $reservation->survey_name,
+                'visit_date' => $this->getAnswerValue($entry, 'Visit Date and Time'),
+                'registration_type' => $this->getAnswerValue($entry, 'Registration Type'),
+                'full_name' => $this->getAnswerValue($entry, 'Full name'),
+                'participant_name' => $entry->participant ? $entry->participant->name : 'Guest',
+                'participant_email' => $entry->participant ? $entry->participant->email : '-',
+                'created_at' => $reservation->created_at,
+                'status' => $reservation->isVisited ? 'Visited' : 'Pending',
+                'time_in' => $reservation->time_in ? date('Y-m-d H:i:s', strtotime($reservation->time_in)) : null,
+                'time_out' => $reservation->time_out ? date('Y-m-d H:i:s', strtotime($reservation->time_out)) : null,
+                'feedback_entry_id' => $reservation->feedback_entry_id,
+            ];
+        })->toArray();
     }
 
     public function details($id)
@@ -39,6 +70,38 @@ class AdminReservationController extends Controller
             $entry = Entry::with(['survey', 'answers.question', 'participant'])
                 ->where('id', $id)
                 ->firstOrFail();
+
+            // Get time tracking data using raw SQL
+            $timeData = DB::selectOne("
+            SELECT
+                CASE
+                    WHEN e1.isVisited = 1 THEN e1.updated_at
+                    ELSE NULL
+                END as time_in,
+                e2.created_at as time_out,
+                e2.id as feedback_entry_id
+            FROM entries e1
+            LEFT JOIN entries e2 ON e1.participant_id = e2.participant_id
+                AND e2.survey_id = 2
+            WHERE e1.id = ? AND e1.survey_id = 1
+        ", [$id]);
+
+            $feedbackAnswers = [];
+            if ($timeData && $timeData->feedback_entry_id) {
+                $feedbackEntry = Entry::with(['answers.question'])
+                    ->find($timeData->feedback_entry_id);
+                if ($feedbackEntry) {
+                    foreach ($feedbackEntry->answers as $answer) {
+                        $feedbackAnswers[] = [
+                            'question' => $answer->question ? $answer->question->content : null,
+                            'value' => $answer->value,
+                        ];
+                    }
+                }
+            }
+
+            Log::info('Feedback Answers: ', $feedbackAnswers);
+
 
             $reservation = [
                 'id' => $entry->id,
@@ -53,7 +116,11 @@ class AdminReservationController extends Controller
                 'participant_name' => $entry->participant ? $entry->participant->name : 'Guest',
                 'participant_email' => $entry->participant ? $entry->participant->email : '-',
                 'created_at' => $entry->created_at->format('Y-m-d H:i:s'),
-                'status' => $entry->isVisited ? 'Visited' : 'Pending'
+                'status' => $entry->isVisited ? 'Visited' : 'Pending',
+                'time_in' => $timeData && $timeData->time_in ? date('Y-m-d H:i:s', strtotime($timeData->time_in)) : null,
+                'time_out' => $timeData && $timeData->time_out ? date('Y-m-d H:i:s', strtotime($timeData->time_out)) : null,
+                'feedback_entry_id' => $timeData ? $timeData->feedback_entry_id : null,
+                'feedback_answers' => $feedbackAnswers,
             ];
 
             // Add demographic information for group registrations
@@ -127,8 +194,10 @@ class AdminReservationController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
+        $usedEntryIds = [];
 
         $reservations = Entry::with(['survey', 'answers.question', 'participant'])
+            ->where('survey_id', 1) // Only Visitor Information entries
             ->whereHas('answers', function ($q) use ($query) {
                 $q->whereHas('question', function ($qq) {
                     $qq->where('content', 'Full name');
@@ -139,19 +208,43 @@ class AdminReservationController extends Controller
                   ->orWhere('email', 'like', "%{$query}%");
             })
             ->get()
-            ->map(function ($entry) {
+            ->map(function ($entry1) use (&$usedEntryIds) {
+                if (in_array($entry1->id, $usedEntryIds)) {
+                    return null;
+                }
+
+                // Find corresponding feedback entry
+                $entry2 = Entry::where('device_identifier', $entry1->device_identifier)
+                    ->where('survey_id', 2)
+                    ->whereNotIn('id', $usedEntryIds)
+                    ->first();
+
+                if ($entry2) {
+                    $usedEntryIds[] = $entry1->id;
+                    $usedEntryIds[] = $entry2->id;
+                }
+
+                // Calculate time_in and time_out
+                $timeIn = null;
+                if ($entry1->created_at != $entry1->updated_at) {
+                    $timeIn = $entry1->updated_at->format('Y-m-d H:i:s');
+                }
+                $timeOut = $entry2 ? $entry2->created_at->format('Y-m-d H:i:s') : null;
+
                 return [
-                    'id' => $entry->id,
-                    'survey_name' => $entry->survey->name,
-                    'visit_date' => $this->getAnswerValue($entry, 'Visit Date and Time'),
-                    'registration_type' => $this->getAnswerValue($entry, 'Registration Type'),
-                    'full_name' => $this->getAnswerValue($entry, 'Full name'),
-                    'participant_name' => $entry->participant ? $entry->participant->name : 'Guest',
-                    'participant_email' => $entry->participant ? $entry->participant->email : '-',
-                    'created_at' => $entry->created_at->format('Y-m-d H:i:s'),
-                    'status' => $entry->isVisited ? 'Visited' : 'Pending'
+                    'id' => $entry1->id,
+                    'survey_name' => $entry1->survey->name,
+                    'visit_date' => $this->getAnswerValue($entry1, 'Visit Date and Time'),
+                    'registration_type' => $this->getAnswerValue($entry1, 'Registration Type'),
+                    'full_name' => $this->getAnswerValue($entry1, 'Full name'),
+                    'participant_name' => $entry1->participant ? $entry1->participant->name : 'Guest',
+                    'participant_email' => $entry1->participant ? $entry1->participant->email : '-',
+                    'created_at' => $entry1->created_at->format('Y-m-d H:i:s'),
+                    'status' => $entry1->isVisited ? 'Visited' : 'Pending',
+                    'time_in' => $timeIn,
+                    'time_out' => $timeOut,
                 ];
-            });
+            })->filter()->values();
 
         return response()->json([
             'success' => true,

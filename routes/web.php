@@ -49,8 +49,8 @@ Route::middleware(['guest.survey.auth'])->group(function () {
     Route::post('/guest-survey', [GuestController::class, 'store'])->name('guest.survey.store');
 
 
-//Route::get('/feedback-survey', [FeedbackController::class, 'create'])->name('feedback.survey.create');
-//Route::post('/feedback-survey', [FeedbackController::class, 'store'])->name('feedback.survey.store');
+Route::get('/feedback-survey', [FeedbackController::class, 'create'])->name('feedback.survey.create');
+Route::post('/feedback-survey', [FeedbackController::class, 'store'])->name('feedback.survey.store');
 });
 
 

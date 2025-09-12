@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
        $this->call(SurveySeeder::class);
 //       $this->call(FeedbackSeeder::class);
 //       $this->call(EventSeeder::class);
-//       $this->call(FeedbackSeeder::class);
+       $this->call(FeedbackSeeder::class);
 //       $this->call(SurveyAnswerSeeder::class);
     }
 }

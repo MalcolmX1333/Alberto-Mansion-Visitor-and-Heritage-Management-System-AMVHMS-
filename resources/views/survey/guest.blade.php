@@ -149,6 +149,16 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6 custom-background">
+            @if(session('success'))
+                <div class="alert alert-success">
+                    <i class="bx bx-check-circle mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-warning">
+                    <i class="bx bx-error-circle mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
             <div class="text-center">
                 <i class="fas fa-building museum-icon"></i>
                 <h2 class="page-title">
@@ -163,18 +173,12 @@
             <form method="POST" action="{{ route('guest.survey.store') }}" id="surveyForm">
                 @csrf
 
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('error') }}
-                    </div>
-                @endif
 
-                @if($errors->any())
+
+
+
+
+            @if($errors->any())
                     <div class="alert alert-warning">
                         <ul class="mb-0">
                             @foreach($errors->all() as $error)
