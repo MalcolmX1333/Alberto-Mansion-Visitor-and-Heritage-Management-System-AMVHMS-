@@ -32,10 +32,10 @@
     </li>
 
         <!-- Reports -->
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-file"></i>
-                <div data-i18n="Reports">Feedback</div>
+        <li class="menu-item {{ request()->routeIs('gallery.index') ? ' active' : '' }}">
+            <a href="{{route('gallery.index')}}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-image-add"></i>
+                <div data-i18n="Reports">Gallery</div>
             </a>
         </li>
 
