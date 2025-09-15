@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminReservationController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\GuestGalleryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +69,26 @@ Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'
 
 Route::get('/registration-type-demographics', [HomeController::class, 'registrationTypeDemographics'])->name('registration.type.demographics');
 
+
+Route::get('/gallery/index', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/gallery/create', [GalleryController::class, 'create'])->name('gallery.create');
+Route::post('/gallery/store', [GalleryController::class, 'store'])->name('gallery.store');
+Route::get('/gallery/show/{id}', [GalleryController::class, 'show'])->name('gallery.show');
+Route::get('/gallery/{id}/edit', [GalleryController::class, 'edit'])->name('gallery.edit');
+Route::put('/gallery/{id}', [GalleryController::class, 'update'])->name('gallery.update');
+Route::delete('/gallery/{id}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
+
+
+
+Route::delete('/gallery/image/{id}', [GalleryImageController::class, 'destroy'])->name('gallery.image.destroy');
+Route::post('/gallery/{galleryId}/image', [GalleryImageController::class, 'store'])->name('gallery.image.store');
+Route::post('/gallery/image/{id}/edit', [GalleryImageController::class, 'edit'])->name('gallery.image.edit');
+
+Route::get('/gallery', [GuestGalleryController::class, 'index'])->name('gallery');
+Route::get('/gallery/{id}', [GuestGalleryController::class, 'show'])->name('gallery.guest.show');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/visit/unauthorized', function () {
     return view('layouts.partials.unauthorizedVisit');

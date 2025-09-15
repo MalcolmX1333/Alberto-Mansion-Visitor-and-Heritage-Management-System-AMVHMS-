@@ -72,8 +72,8 @@
             <div class="col-auto">
                 <nav class="nav-menu-left">
                     <ul class="nav-menu d-flex">
-                        <li class="menu-active"><a href="#">Home</a></li>
-                        <li><a href="#">Gallery</a></li>
+                        <li class="menu-active"><a href="{{route('landing.page')}}">Home</a></li>
+                        <li><a href="{{route('gallery')}}">Gallery</a></li>
                     </ul>
                 </nav>
             </div>
@@ -90,7 +90,7 @@
                 <nav class="nav-menu-right">
                     <ul class="nav-menu d-flex">
                         <li><a href="#">Heritage</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="{{route('contact')}}">Contact</a></li>
                     </ul>
                 </nav>
             </div>

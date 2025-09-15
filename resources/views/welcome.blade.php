@@ -478,43 +478,15 @@
                 </div>
             </div>
             <div id="grid-container" class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Mansion+Exterior&bg=8b4513&color=f5f2e8" loading="lazy" alt="Mansion Exterior"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Colonial+Rooms&bg=d4af37&color=2c1810" loading="lazy" alt="Colonial Rooms"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Antique+Furniture&bg=5e8c00&color=ffffff" loading="lazy" alt="Antique Furniture"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Historical+Artifacts&bg=b8860b&color=ffffff" loading="lazy" alt="Historical Artifacts"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Garden+Views&bg=8b4513&color=f5f2e8" loading="lazy" alt="Garden Views"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Spanish+Architecture&bg=d4af37&color=2c1810" loading="lazy" alt="Spanish Architecture"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Heritage+Collection&bg=5e8c00&color=ffffff" loading="lazy" alt="Heritage Collection"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Traditional+Decor&bg=b8860b&color=ffffff" loading="lazy" alt="Traditional Decor"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Historic+Dining&bg=8b4513&color=f5f2e8" loading="lazy" alt="Historic Dining"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Family+Portraits&bg=d4af37&color=2c1810" loading="lazy" alt="Family Portraits"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Vintage+Items&bg=5e8c00&color=ffffff" loading="lazy" alt="Vintage Items"></a>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <a class="single-gallery" href="#"><img class="grid-item" src="https://placehold.co/400x300?text=Cultural+Displays&bg=b8860b&color=ffffff" loading="lazy" alt="Cultural Displays"></a>
-                </div>
+                @for($i = 1; $i <= 12; $i++)
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <a class="single-gallery" href="{{ asset('asset/welcome/' . $i . '.jpeg') }}">
+                            <img class="grid-item" src="{{ asset('asset/welcome/' . $i . '.jpeg') }}" loading="lazy" alt="Gallery Image {{ $i }}">
+                        </a>
+                    </div>
+                @endfor
             </div>
+
         </div>
     </section>
     <!-- End Gallery Area -->
