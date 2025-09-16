@@ -234,7 +234,7 @@
             <div class="d-sm-flex align-items-center justify-content-between">
                 <h1 class="dashboard-title">Dashboard</h1>
                 <button id="generateReportButton" class="modern-btn d-none d-sm-inline-block">
-                    <i class="fas fa-download me-2"></i>Generate Report
+                    <i class="mdi mdi-download me-2"></i>Generate Report
                 </button>
             </div>
         </div>
@@ -261,7 +261,7 @@
                                     <div class="col-12 mb-4">
                                         <div class="stat-card card text-center p-4 border-0">
                                             <div class="stat-icon">
-                                                <i class="fas fa-eye"></i>
+                                                <i class="mdi mdi-eye-outline"></i>
                                             </div>
                                             <div class="card-body">
                                                 <h5 class="stat-title">Visits Today</h5>
@@ -274,7 +274,7 @@
                                     <div class="col-12">
                                         <div class="stat-card card text-center p-4 border-0">
                                             <div class="stat-icon">
-                                                <i class="fas fa-calendar-alt"></i>
+                                                <i class="mdi mdi-calendar-month-outline"></i>
                                             </div>
                                             <div class="card-body">
                                                 <h5 class="stat-title">Visits This Month</h5>
@@ -299,8 +299,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h3 class="chart-title">Age Demographics</h3>
                             <div class="input-group" style="width: auto;">
-                                <span class="input-group-text filter-icon">
-                                    <i class="fas fa-filter"></i>
+                               <span class="input-group-text filter-icon">
+                                    <i class="mdi mdi-filter-variant"></i>
                                 </span>
                                 <select class="form-select modern-filter" aria-label="Filter by Time Period" id="ageFilter">
                                     <option selected>Filter by</option>

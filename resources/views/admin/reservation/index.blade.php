@@ -1,32 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid py-4">
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white py-3">
-                <div class="row align-items-center g-3">
-                    <div class="col-12 col-md-6">
-                        <h5 class="mb-0 text-gray-800 fw-bold">All Reservations</h5>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
-                            <button class="btn btn-primary btn-sm" onclick="openQRScanner()">
-                                <i class="fas fa-camera me-1"></i> Scan QR
-                            </button>
-                            <button class="btn btn-success btn-sm" onclick="refreshTable()">
-                                <i class="fas fa-sync me-1"></i> Refresh
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body p-2 p-md-4">
-                <div class="table-responsive-xl">
-                    <table class="table table-hover align-middle nowrap" id="reservationsTable" width="100%" cellspacing="0">
-                        <thead class="table-light">
+    <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">All Reservations</h4>
+                    <button class="btn btn-sm btn-primary mb-3 me-2" onclick="openQRScanner()">
+                        <i class="mdi mdi-camera"></i> Scan QR
+                    </button>
+                    <button class="btn btn-sm btn-success mb-3 me-2" onclick="refreshTable()">
+                        <i class="mdi mdi-refresh"></i> Refresh
+                    </button>
+                    <div class="table-responsive">
+                        <table id="reservationsTable" class="table table-hover align-middle nowrap">
+                            <thead>
                             <tr>
-{{--                                <th>ID</th>--}}
-{{--                                <th>Survey</th>--}}
                                 <th>Visit Date</th>
                                 <th class="text-center">Type</th>
                                 <th>Full Name</th>
@@ -38,70 +27,66 @@
                                 <th>Time Out</th>
                                 <th class="text-center">Actions</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($reservations as $reservation)
-                            <tr>
-{{--                                <td>{{ $reservation['id'] ?? '-'}}</td>--}}
-{{--                                <td>{{ $reservation['survey_name'] ?? '-'}}</td>--}}
-                                <td>{{ $reservation['visit_date'] ?? '-'}}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary">{{ $reservation['registration_type'] }}</span>
-                                </td>
-                                <td>{{ $reservation['full_name'] ?? '-'}}</td>
-                                <td>{{ $reservation['participant_name'] ?? '-'}}</td>
-                                <td>{{ $reservation['participant_email'] ?? '-'}}</td>
-                                <td class="text-center">
-                                    @if($reservation['status'] === 'Visited')
-                                        <span class="badge bg-success">{{ $reservation['status'] ?? '-'}}</span>
-                                    @else
-                                        <span class="badge bg-warning">{{ $reservation['status'] ?? '-'}}</span>
-                                    @endif
-                                </td>
-                                <td>{{ $reservation['created_at'] ?? '-'}}</td>
-                                <td>
-                                    {{ $reservation['time_in'] ?? '-' }}
-                                </td>
-                                <td>
-                                @if($reservation['time_in'])
-                                    {{ $reservation['time_out'] ?? '-' }}
-                                @else
-                                    -
-                                @endif
-                                </td>
-
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <button class="btn btn-info btn-sm" title="View Details" onclick="viewDetails({{ $reservation['id'] }})">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-success btn-sm" title="Generate QR" onclick="generateQR({{ $reservation['id'] }})">
-                                            <i class="fas fa-qrcode"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm" title="Toggle Status" onclick="toggleStatus({{ $reservation['id'] }}, '{{ $reservation['status'] }}')">
-                                            <i class="fas fa-toggle-on"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" title="Delete" onclick="deleteReservation({{ $reservation['id'] }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            @foreach($reservations as $reservation)
+                                <tr>
+                                    <td>{{ $reservation['visit_date'] ?? '-'}}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ $reservation['registration_type'] }}</span>
+                                    </td>
+                                    <td>{{ $reservation['full_name'] ?? '-'}}</td>
+                                    <td>{{ $reservation['participant_name'] ?? '-'}}</td>
+                                    <td>{{ $reservation['participant_email'] ?? '-'}}</td>
+                                    <td class="text-center">
+                                        @if($reservation['status'] === 'Visited')
+                                            <span class="badge bg-success">{{ $reservation['status'] ?? '-'}}</span>
+                                        @else
+                                            <span class="badge bg-warning">{{ $reservation['status'] ?? '-'}}</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $reservation['created_at'] ?? '-'}}</td>
+                                    <td>{{ $reservation['time_in'] ?? '-' }}</td>
+                                    <td>
+                                        @if($reservation['time_in'])
+                                            {{ $reservation['time_out'] ?? '-' }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-info btn-sm" title="View Details" onclick="viewDetails({{ $reservation['id'] }})">
+                                                <i class="mdi mdi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-success btn-sm" title="Generate QR" onclick="generateQR({{ $reservation['id'] }})">
+                                                <i class="mdi mdi-qrcode"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-sm" title="Toggle Status" onclick="toggleStatus({{ $reservation['id'] }}, '{{ $reservation['status'] }}')">
+                                                <i class="mdi mdi-toggle-switch"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" title="Delete" onclick="deleteReservation({{ $reservation['id'] }})">
+                                                <i class="mdi mdi-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- QR Scanner Modal -->
+    <!-- QR Scanner Modal (unchanged except icon) -->
     <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="qrScannerModalLabel">
-                        <i class="fas fa-camera me-2"></i>QR Code Scanner
+                        <i class="mdi mdi-camera me-2"></i>QR Code Scanner
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -120,142 +105,6 @@
 @section('styles')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
-    <style>
-        .table-responsive-xl {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table {
-            min-width: 100%;
-            width: max-content !important;
-        }
-
-        .table td, .table th {
-            white-space: nowrap;
-            min-width: 100px;
-            padding: 0.75rem;
-            vertical-align: middle;
-        }
-
-        .card {
-            border-radius: 0.5rem;
-        }
-
-        .card-header {
-            border-bottom: 1px solid rgba(0,0,0,.125);
-        }
-
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 1rem;
-        }
-
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            margin-top: 1rem;
-            padding: 0.5rem;
-        }
-
-        .table-responsive-xl::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .table-responsive-xl::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .table-responsive-xl::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        .table-responsive-xl::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* QR Scanner Styles */
-        #qr-reader {
-            border: 2px solid #007bff;
-            border-radius: 8px;
-        }
-
-        #qr-reader__camera_selection {
-            margin-bottom: 1rem;
-        }
-
-        #qr-reader__scan_region {
-            margin: 0 auto;
-        }
-
-        #qr-reader__dashboard {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .qr-success {
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        .qr-error {
-            color: #dc3545;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .table td, .table th {
-                padding: 0.5rem;
-                font-size: 0.875rem;
-            }
-
-            .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_filter {
-                width: 100%;
-                margin-bottom: 0.5rem;
-            }
-
-            .dataTables_wrapper .dataTables_filter input {
-                width: 100%;
-                margin-left: 0 !important;
-            }
-
-            .btn-group .btn {
-                padding: 0.25rem 0.4rem;
-                font-size: 0.75rem;
-            }
-
-            #qr-reader {
-                max-width: 100%;
-            }
-        }
-
-        .btn:focus {
-            box-shadow: none;
-        }
-
-        .btn-info {
-            color: #fff;
-        }
-
-        .swal-wide {
-            max-width: 700px !important;
-        }
-
-        .swal-qr {
-            max-width: 500px !important;
-        }
-
-        .swal-qr img {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            background: white;
-        }
-    </style>
 @endsection
 
 @section('scripts')
@@ -268,33 +117,30 @@
     <script>
         let html5QrcodeScanner = null;
 
-        $(document).ready(function() {
-            var table = $('#reservationsTable').DataTable({
-                pageLength: 25,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                scrollX: true,
-                scrollCollapse: true,
-                autoWidth: false,
-                order: [[ 8, "desc" ]],
-                columnDefs: [
-                    { "orderable": false, "targets": 9 }
-                ],
-                dom: '<"row"<"col-12 col-md-6"l><"col-12 col-md-6"f>>rtip',
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search reservations...",
-                    lengthMenu: "Show _MENU_ entries"
-                },
-                initComplete: function() {
-                    table.columns.adjust();
+       $(document).ready(function() {
+                $('#reservationsTable').DataTable({
+                    pageLength: 25,
+                    autoWidth: false,
+                    order: [[ 8, "desc" ]],
+                    columnDefs: [
+                        { "orderable": false, "targets": 9 }
+                    ],
+                    dom: '<"row"<"col-12 col-md-6"l><"col-12 col-md-6"f>>rtip',
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search reservations...",
+                        lengthMenu: "Show _MENU_ entries"
+                    },
+                    initComplete: function() {
+                        this.api().columns.adjust();
 
-                    if (window.innerWidth < 768) {
-                        $('.dataTables_wrapper').append(
-                            '<div class="text-muted text-center small mt-2">Swipe left/right to see more columns</div>'
-                        );
+                        if (window.innerWidth < 768) {
+                            $('.dataTables_wrapper').append(
+                                '<div class="text-muted text-center small mt-2">Swipe left/right to see more columns</div>'
+                            );
+                        }
                     }
-                }
-            });
+                });
 
             var resizeTimer;
             $(window).on('resize', function() {

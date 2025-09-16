@@ -7,7 +7,7 @@
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h1 id="gallery-name" class="display-4">{{ $gallery->name }}</h1>
                 <div>
-                    <i class="fas fa-pencil-alt ms-3 text-muted" style="cursor: pointer;" onclick="editGalleryName()"></i>
+                    <i class="mdi mdi-pencil ms-3 text-muted" style="cursor: pointer;" onclick="editGalleryName()"></i>
                     <a href="{{ route('gallery.index') }}" class="btn btn-outline-primary ms-3">Back to Galleries</a>
                 </div>
             </div>
@@ -17,7 +17,7 @@
         <div class="row mb-5">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <p id="gallery-description" class="lead text-muted">{{ $gallery->description }}</p>
-                <i class="fas fa-pencil-alt ms-3 text-muted" style="cursor: pointer;" onclick="editGalleryDescription()"></i>
+                <i class="mdi mdi-pencil ms-3 text-muted" style="cursor: pointer;" onclick="editGalleryDescription()"></i>
             </div>
         </div>
 
@@ -39,13 +39,13 @@
                                 <p class="card-text">{{ $image->description }}</p>
                                 <div class="position-absolute top-0 end-0 p-2">
                                     <button class="btn btn-link text-primary p-0" onclick="showEditModal({{ $image->id }}, '{{ $image->title }}', '{{ $image->description }}')">
-                                        <i class="fas fa-pencil-alt"></i>
+                                        <i class="mdi mdi-pencil"></i>
                                     </button>
                                     <form action="{{ route('gallery.image.destroy', $image->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-link text-danger p-0">
-                                            <i class="fas fa-trash-alt"></i>
+                                            <i class="mdi mdi-trash-can"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -58,11 +58,16 @@
             <!-- Add New Image Button -->
             <div class="col-md-4 col-lg-3 mb-4 d-flex justify-content-center align-items-center">
                 <button class="btn btn-outline-primary" onclick="showCreateModal()">
-                    <i class="fas fa-plus"></i>
+                    <i class="mdi mdi-plus"></i>
                 </button>
             </div>
         </div>
     </div>
+
+    @section('styles')
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+        @parent
+    @endsection
 
     <!-- Scripts -->
     <script>
