@@ -39,6 +39,13 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('event.index') ? ' active' : '' }}">
+            <a href="{{ route('event.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar"></i>
+                <div data-i18n="Events">Events</div>
+            </a>
+    </li>
+
         <!-- Interface Section -->
 {{--        <li class="menu-header small text-uppercase"><span class="menu-header-text">Landing Page</span></li>--}}
 

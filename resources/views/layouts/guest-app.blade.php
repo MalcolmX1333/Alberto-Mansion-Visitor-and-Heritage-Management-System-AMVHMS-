@@ -89,7 +89,7 @@
             <div class="col-auto">
                 <nav class="nav-menu-right">
                     <ul class="nav-menu d-flex">
-                        <li><a href="#">Heritage</a></li>
+                        <li><a href="{{route('event')}}">Events</a></li>
                         <li><a href="{{route('contact')}}">Contact</a></li>
                     </ul>
                 </nav>

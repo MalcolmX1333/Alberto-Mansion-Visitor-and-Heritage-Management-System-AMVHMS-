@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminReservationController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\GalleryImageController;
@@ -79,6 +80,15 @@ Route::put('/gallery/{id}', [GalleryController::class, 'update'])->name('gallery
 Route::delete('/gallery/{id}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
 
 
+Route::get('/event/admin', [EventController::class, 'index'])->name('event.index');
+Route::get('/event/data', [EventController::class, 'getEvents'])->name('event.data');
+Route::post('/event/store', [EventController::class, 'store'])->name('event.store');
+Route::post('/event/edit/{id}', [EventController::class, 'edit'])->name('event.edit');
+Route::delete('/event/destroy/{id}', [EventController::class, 'destroy'])->name('event.destroy');
+
+Route::get('/event',function (){
+    return view('event');
+})->name('event');
 
 Route::delete('/gallery/image/{id}', [GalleryImageController::class, 'destroy'])->name('gallery.image.destroy');
 Route::post('/gallery/{galleryId}/image', [GalleryImageController::class, 'store'])->name('gallery.image.store');
