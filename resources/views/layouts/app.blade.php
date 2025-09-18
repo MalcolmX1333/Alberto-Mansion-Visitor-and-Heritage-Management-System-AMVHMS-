@@ -27,7 +27,7 @@
 
         <nav class="navbar p-0 fixed-top d-flex flex-row">
             <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-                <a class="navbar-brand brand-logo-mini" href="index.html"><img src="{{asset('logo.png')}}" alt="logo" /></a>
+                <a class="navbar-brand brand-logo-mini" href="{{route('home')}}"><img src="{{asset('BCHATO.webp')}}" alt="logo" /></a>
             </div>
             <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -39,7 +39,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                             <div class="navbar-profile">
-                                <img class="img-xs rounded-circle" src="assets/images/faces/face15.jpg" alt="">
+                             <img class="img-xs rounded-circle" src="{{ asset('storage/' . (auth()->user()->profile_image ?? 'assets/images/faces/face15.jpg')) }}" alt="">
                                 <p class="mb-0 d-none d-sm-block navbar-profile-name">{{auth()->user()->name}}</p>
                                 <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                             </div>
@@ -47,7 +47,7 @@
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
                             <h6 class="p-3 mb-0">Profile</h6>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item preview-item" href="#">
+                            <a class="dropdown-item preview-item" href="{{route('admin.profile.index')}}">
                                 <div class="preview-thumbnail">
                                     <div class="preview-icon bg-dark rounded-circle">
                                         <i class="mdi mdi-settings text-success"></i>

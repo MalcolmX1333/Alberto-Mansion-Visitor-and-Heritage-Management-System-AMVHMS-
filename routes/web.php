@@ -22,6 +22,14 @@ Auth::routes();
 // Instead of /create/{id}/qr-code, try:
 Route::get('/reservation/{id}/qr-code', [App\Http\Controllers\QRController::class, 'generateQrCode'])->name('generate.qr');
 
+
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('admin.profile.index');
+    Route::put('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
+});
+
+
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/age-demographics', [HomeController::class, 'ageDemographics'])->name('age-demographics');
