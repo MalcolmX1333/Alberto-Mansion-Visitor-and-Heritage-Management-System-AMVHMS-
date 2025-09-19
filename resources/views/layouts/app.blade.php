@@ -40,7 +40,7 @@
                         <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
                             <div class="navbar-profile">
                              <img class="img-xs rounded-circle" src="{{ asset('storage/' . (auth()->user()->profile_image ?? 'assets/images/faces/face15.jpg')) }}" alt="">
-                                <p class="mb-0 d-none d-sm-block navbar-profile-name">{{auth()->user()->name}}</p>
+                                <p class="mb-0 d-none d-sm-block navbar-profile-name">{{auth()->user()->name ?? ''}}</p>
                                 <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                             </div>
                         </a>

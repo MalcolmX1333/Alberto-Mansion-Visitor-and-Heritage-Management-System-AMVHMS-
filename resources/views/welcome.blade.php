@@ -492,3 +492,5 @@
     <!-- End Gallery Area -->
 
 @endsection
+
+

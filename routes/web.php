@@ -79,6 +79,13 @@ Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'
 Route::get('/registration-type-demographics', [HomeController::class, 'registrationTypeDemographics'])->name('registration.type.demographics');
 
 
+
+// Guest Profile Routes
+Route::middleware(['auth'])->prefix('guest')->name('guest.')->group(function () {
+    Route::get('profile', [\App\Http\Controllers\Guest\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('profile', [\App\Http\Controllers\Guest\ProfileController::class, 'update'])->name('profile.update');
+});
+
 Route::get('/gallery/index', [GalleryController::class, 'index'])->name('gallery.index');
 Route::get('/gallery/create', [GalleryController::class, 'create'])->name('gallery.create');
 Route::post('/gallery/store', [GalleryController::class, 'store'])->name('gallery.store');

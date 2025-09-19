@@ -42,7 +42,7 @@
                                 <i class="fa fa-user-circle"></i> {{ Auth::user()->name }}
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="">
+                                <a class="dropdown-item" href="{{route('guest.profile.index')}}">
                                     <i class="fa fa-user"></i> Profile
                                 </a>
                                 <a class="dropdown-item" href="{{route('guest.reservation.index')}}">
@@ -108,7 +108,7 @@
                 <div class="single-footer-widget">
                     <h6>About Us</h6>
                     <p>
-                        <img src="{{ asset('alberto_mansion_logo.png') }}" alt="Alberto Mansion Logo" style="max-width: 150px;">
+                        <img src="{{ asset('binanlogo.png') }}" alt="Alberto Mansion Logo" style="max-width: 150px;">
                     </p>
                     <p>
                         <strong>Heritage Team</strong><br>
