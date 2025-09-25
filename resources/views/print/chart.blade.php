@@ -71,12 +71,18 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($ageData as $ageGroup => $count)
+        @if(!empty($ageData))
+            @foreach($ageData as $ageGroup => $count)
+                <tr>
+                    <td>{{ $ageGroup }}</td>
+                    <td>{{ $count }}</td>
+                </tr>
+            @endforeach
+        @else
             <tr>
-                <td>{{ $ageGroup }}</td>
-                <td>{{ $count }}</td>
+                <td colspan="2">No data available</td>
             </tr>
-        @endforeach
+        @endif
         </tbody>
     </table>
 </div>
@@ -94,20 +100,26 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($genderData as $gender => $count)
+        @if(!empty($genderData))
+            @foreach($genderData as $gender => $count)
+                <tr>
+                    <td>{{ $gender }}</td>
+                    <td>{{ $count }}</td>
+                </tr>
+            @endforeach
+        @else
             <tr>
-                <td>{{ $gender }}</td>
-                <td>{{ $count }}</td>
+                <td colspan="2">No data available</td>
             </tr>
-        @endforeach
+        @endif
         </tbody>
     </table>
 </div>
 
 <div class="section">
-    <h2 class="section-header">Most Visited Locations</h2>
+    <h2 class="section-header">Most Visited Days</h2>
     <div class="chart">
-        <img src="file://{{ $mostVisitedChart }}" alt="Most Visited Locations Chart">
+        <img src="file://{{ $mostVisitedChart }}" alt="Most Visited Days Chart">
     </div>
     <table class="data-table">
         <thead>
@@ -117,12 +129,18 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($mostVisitedData as $day => $visits)
+        @if(!empty($mostVisitedData))
+            @foreach($mostVisitedData as $day => $visits)
+                <tr>
+                    <td>{{ $day }}</td>
+                    <td>{{ $visits }}</td>
+                </tr>
+            @endforeach
+        @else
             <tr>
-                <td>{{ $day }}</td>
-                <td>{{ $visits }}</td>
+                <td colspan="2">No data available</td>
             </tr>
-        @endforeach
+        @endif
         </tbody>
     </table>
 </div>
@@ -140,12 +158,18 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($studentData as $studentGroup => $count)
+        @if(!empty($studentData))
+            @foreach($studentData as $studentGroup => $count)
+                <tr>
+                    <td>{{ $studentGroup }}</td>
+                    <td>{{ $count }}</td>
+                </tr>
+            @endforeach
+        @else
             <tr>
-                <td>{{ $studentGroup }}</td>
-                <td>{{ $count }}</td>
+                <td colspan="2">No data available</td>
             </tr>
-        @endforeach
+        @endif
         </tbody>
     </table>
 </div>

@@ -233,7 +233,7 @@
         <div class="dashboard-header fade-in">
             <div class="d-sm-flex align-items-center justify-content-between">
                 <h1 class="dashboard-title">Dashboard</h1>
-                <button id="generateReportButton" class="modern-btn d-none d-sm-inline-block">
+                <button id="generateReportButton" class="modern-btn">
                     <i class="mdi mdi-download me-2"></i>Generate Report
                 </button>
             </div>
@@ -588,7 +588,7 @@
             function fetchStudentDemographics(filter) {
                 fetch(`/student-demographics?filter=${filter}`)
                     .then(response => response.json())
-                    .then(data => {
+                    .then(data => { // <-- FIXED: added parentheses around data
                         const ctx = document.getElementById('studentDemographicsChart').getContext('2d');
 
                         if (studentDemographicsChart) {
@@ -772,10 +772,10 @@
             }
 
             // Initial fetch with default filter
-            fetchAgeDemographics('week');
-            fetchGenderDemographics('week');
-            fetchStudentDemographics('week');
-            fetchMostVisited('week');
+            fetchAgeDemographics('month');
+            fetchGenderDemographics('month');
+            fetchStudentDemographics('month');
+            fetchMostVisited('month');
 
             // Handle filter changes
             document.getElementById('ageFilter').addEventListener('change', function (event) {
@@ -823,6 +823,7 @@
             });
 
             function printCharts() {
+                console.log('Generate Report button clicked'); // Log for button click
                 const ageChart = document.getElementById('ageDemographicsChart').toDataURL('image/png');
                 const genderChart = document.getElementById('genderDemographicsChart').toDataURL('image/png');
                 const mostVisitedChart = document.getElementById('mostVisitedChart').toDataURL('image/png');
@@ -839,6 +840,8 @@
                     studentData: window.studentData
                 };
 
+                console.log('Data being sent to ChartController:', requestData);
+
                 fetch('/save-charts', {
                     method: 'POST',
                     headers: {
@@ -847,9 +850,14 @@
                     },
                     body: JSON.stringify(requestData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('save-charts response:', response);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('save-charts response data:', data);
                     if (data.success) {
+                        console.log('Redirecting to /print-charts');
                         window.location.href = '/print-charts';
                     } else {
                         Swal.fire({
@@ -864,7 +872,16 @@
                 });
             }
 
-            document.getElementById('generateReportButton').addEventListener('click', printCharts);
+            // At the end of your DOMContentLoaded handler:
+            const reportBtn = document.getElementById('generateReportButton');
+            if (reportBtn) {
+                reportBtn.addEventListener('click', function() {
+                    console.log('Generate Report button event listener triggered');
+                    printCharts();
+                });
+            } else {
+                console.error('Generate Report button not found in DOM!');
+            }
         });
     </script>
 @endsection

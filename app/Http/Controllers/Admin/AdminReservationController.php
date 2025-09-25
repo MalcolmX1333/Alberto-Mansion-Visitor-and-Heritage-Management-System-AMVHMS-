@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ReservationDetailsExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use MattDaneshvar\Survey\Models\Entry;
 use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -297,4 +299,11 @@ class AdminReservationController extends Controller
 
         return $answer ? $answer->value : '-';
     }
+
+    public function exportReservations(Request $request)
+    {
+        $period = $request->input('period'); // optional, e.g., 'monthly', 'quarterly', etc.
+        return Excel::download(new ReservationDetailsExport($period), 'reservation_details.xlsx');
+    }
+
 }

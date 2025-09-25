@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminReservationController;
+use App\Http\Controllers\Admin\ChartController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FeedbackController;
@@ -78,7 +79,7 @@ Route::get('/guest/reservation/{id}/edit', [ReservationController::class, 'edit'
 
 Route::get('/registration-type-demographics', [HomeController::class, 'registrationTypeDemographics'])->name('registration.type.demographics');
 
-
+Route::get('/admin/reservations/export', [AdminReservationController::class, 'exportReservations'])->name('admin.reservations.export');
 
 // Guest Profile Routes
 Route::middleware(['auth'])->prefix('guest')->name('guest.')->group(function () {
@@ -114,6 +115,9 @@ Route::get('/gallery/{id}', [GuestGalleryController::class, 'show'])->name('gall
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+
+Route::post('/save-charts', [ChartController::class, 'saveCharts'])->name('save.charts');
+Route::get('/print-charts', [ChartController::class, 'printCharts'])->name('print.charts');
 
 Route::get('/visit/unauthorized', function () {
     return view('layouts.partials.unauthorizedVisit');

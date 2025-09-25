@@ -9,9 +9,9 @@
                     <button class="btn btn-sm btn-primary mb-3 me-2" onclick="openQRScanner()">
                         <i class="mdi mdi-camera"></i> Scan QR
                     </button>
-                    <button class="btn btn-sm btn-success mb-3 me-2" onclick="refreshTable()">
-                        <i class="mdi mdi-refresh"></i> Refresh
-                    </button>
+                    <a href="{{ route('admin.reservations.export') }}" class="btn btn-sm btn-success mb-3 me-2">
+                        Export Excel
+                    </a>
                     <div class="table-responsive">
                         <table id="reservationsTable" class="table table-hover align-middle nowrap">
                             <thead>
