@@ -20,17 +20,33 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
+        <!-- Interface Section -->
         <li class="nav-item nav-category">
             <span class="nav-link">Interface</span>
         </li>
+        <!-- Visitor Reservation -->
         <li class="nav-item menu-items {{ request()->routeIs('admin.reservation.index') ? 'active' : '' }}">
             <a class="nav-link" href="{{route('admin.reservation.index')}}">
                 <span class="menu-icon">
                     <i class="mdi mdi-account"></i>
                 </span>
-                <span class="menu-title">Visitor Reservations</span>
+                <span class="menu-title">Visitor Reservation</span>
             </a>
         </li>
+        <!-- Landing Page Section -->
+        <li class="nav-item nav-category">
+            <span class="nav-link">Landing Page</span>
+        </li>
+        <!-- Events -->
+        <li class="nav-item menu-items {{ request()->routeIs('event.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('event.index') }}">
+                <span class="menu-icon">
+                    <i class="mdi mdi-calendar"></i>
+                </span>
+                <span class="menu-title">Events</span>
+            </a>
+        </li>
+        <!-- Gallery -->
         <li class="nav-item menu-items {{ request()->routeIs('gallery.index') ? 'active' : '' }}">
             <a class="nav-link" href="{{route('gallery.index')}}">
                 <span class="menu-icon">
@@ -39,12 +55,17 @@
                 <span class="menu-title">Gallery</span>
             </a>
         </li>
-        <li class="nav-item menu-items {{ request()->routeIs('event.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('event.index') }}">
+        <!-- Inventory Management Section -->
+        <li class="nav-item nav-category">
+            <span class="nav-link">Inventory Management</span>
+        </li>
+        <!-- Artifacts -->
+        <li class="nav-item menu-items {{ request()->routeIs('admin.artifacts.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.artifacts.index') }}">
                 <span class="menu-icon">
-                    <i class="mdi mdi-calendar"></i>
+                    <i class="mdi mdi-archive"></i>
                 </span>
-                <span class="menu-title">Events</span>
+                <span class="menu-title">Artifacts</span>
             </a>
         </li>
     </ul>

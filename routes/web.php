@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminReservationController;
+use App\Http\Controllers\Admin\ArtifactController;
 use App\Http\Controllers\Admin\ChartController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EventController;
@@ -55,6 +56,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/reservations/{id}/qr', [AdminReservationController::class, 'generateQR'])->name('reservation.qr');
         Route::get('/reservations/search', [AdminReservationController::class, 'search'])->name('reservation.search');
         Route::get('/mark-visited/{id}', [AdminReservationController::class, 'markVisited'])->name('reservation.mark-visited');
+
+        Route::resource('artifacts', \App\Http\Controllers\Admin\ArtifactController::class)->except(['create', 'edit']);
     });
 });
 
