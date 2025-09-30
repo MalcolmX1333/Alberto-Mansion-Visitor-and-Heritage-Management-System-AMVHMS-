@@ -218,6 +218,22 @@
                                             </div>
                                         </div>
 
+                                        <!-- Terms and Agreement Checkbox -->
+                                        <div class="form-group mb-3">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="terms" name="terms" required>
+                                                <label class="custom-control-label" for="terms">
+                                                    I agree to the
+                                                    <a href="#" id="show-terms-modal">Terms & Conditions and Privacy Policy</a>
+                                                </label>
+                                            </div>
+                                            @error('terms')
+                                            <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+
                                         <!-- Register Button -->
                                         <button type="submit" class="btn btn-primary btn-user btn-block mb-4">
                                             Register Account
@@ -238,6 +254,7 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -255,6 +272,17 @@
             const passwordType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', passwordType);
             this.classList.toggle('fa-eye-slash');
+        });
+
+        // Show Terms with SweetAlert2
+        document.getElementById('show-terms-modal').addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Terms & Conditions and Privacy Policy',
+                html: 'I confirm that I am at least 18 years old, OR I am under 18 and my parent/guardian has read and agreed to the Terms & Conditions and Privacy Policy, and consents to the collection of my personal data in compliance with the Data Privacy Act of 2012.',
+                icon: 'info',
+                confirmButtonText: 'Close'
+            });
         });
     </script>
     </body>
