@@ -12,5 +12,6 @@ class Artifact extends Model
         'quantity',
         'location',
         'status',
+        'condition', // added condition to fillable
     ];
 }

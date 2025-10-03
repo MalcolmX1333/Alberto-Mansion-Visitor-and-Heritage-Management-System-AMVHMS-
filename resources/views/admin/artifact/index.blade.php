@@ -17,6 +17,7 @@
                             <th>Quantity</th>
                             <th>Location</th>
                             <th>Status</th>
+                            <th>Condition</th>
                             <th>Created At</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -34,6 +35,7 @@
                                         {{ $artifact->status }}
                                     </span>
                                 </td>
+                                <td>{{ $artifact->condition }}</td>
                                 <td>{{ $artifact->created_at }}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
@@ -92,6 +94,17 @@
                             <option value="Unavailable">Unavailable</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="condition" class="form-label">Condition</label>
+                        <select class="form-select" id="condition" name="condition">
+                            <option value="">Select condition</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Save</button>
@@ -120,7 +133,7 @@
             autoWidth: false,
             order: [[ 0, "desc" ]],
             columnDefs: [
-                { "orderable": false, "targets": 7 }
+                { "orderable": false, "targets": 8 }
             ],
             dom: '<"row"<"col-12 col-md-6"l><"col-12 col-md-6"f>>rtip',
             language: {
@@ -150,6 +163,7 @@
                     $('#quantity').val(data.artifact.quantity);
                     $('#location').val(data.artifact.location);
                     $('#status').val(data.artifact.status);
+                    $('#condition').val(data.artifact.condition);
                     $('#artifactModalLabel').text('Edit Artifact');
                     var modal = new bootstrap.Modal(document.getElementById('artifactModal'));
                     modal.show();
@@ -167,7 +181,8 @@
             item_name: $('#item_name').val(),
             quantity: $('#quantity').val(),
             location: $('#location').val(),
-            status: $('#status').val()
+            status: $('#status').val(),
+            condition: $('#condition').val()
         };
         if (id) data.id = id;
 
@@ -235,6 +250,7 @@
                                 <div><strong>Quantity:</strong> ${artifact.quantity}</div>
                                 <div><strong>Location:</strong> ${artifact.location}</div>
                                 <div><strong>Status:</strong> ${artifact.status}</div>
+                                <div><strong>Condition:</strong> ${artifact.condition ?? ''}</div>
                                 <div><strong>Created At:</strong> ${artifact.created_at}</div>
                             </div>
                         `,

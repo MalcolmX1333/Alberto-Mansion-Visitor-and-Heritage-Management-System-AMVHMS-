@@ -41,6 +41,15 @@ class FeedbackController extends Controller
             return redirect()->back()->with('error', 'You have already submitted a response today.');
         }
 
+        // Check if there is an event scheduled for today
+        $today = Carbon::today()->toDateString();
+        $eventExists = \App\Models\Event::whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->exists();
+        if ($eventExists) {
+            return redirect()->back()->with('error', 'There is an event scheduled for today. Feedback submission is not allowed.');
+        }
+
         // Validate the request data based on the form fields
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',

@@ -28,6 +28,7 @@ class ArtifactController extends Controller
             'quantity' => 'required|integer',
             'location' => 'required|string|max:255',
             'status' => 'required|string|max:255',
+            'condition' => 'nullable|string|max:255',
         ]));
         return response()->json(['success' => true, 'artifact' => $artifact]);
     }
@@ -41,6 +42,7 @@ class ArtifactController extends Controller
             'quantity' => 'required|integer',
             'location' => 'required|string|max:255',
             'status' => 'required|string|max:255',
+            'condition' => 'nullable|string|max:255',
         ]));
         return response()->json(['success' => true, 'artifact' => $artifact]);
     }
@@ -51,4 +53,3 @@ class ArtifactController extends Controller
         return response()->json(['success' => true]);
     }
 }
-

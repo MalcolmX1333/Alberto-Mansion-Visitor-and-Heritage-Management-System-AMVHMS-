@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->string('location');
             $table->string('status');
+            $table->string('condition')->nullable();
             $table->timestamps();
         });
     }

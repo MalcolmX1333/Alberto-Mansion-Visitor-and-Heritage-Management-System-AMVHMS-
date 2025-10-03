@@ -28,11 +28,39 @@ class GuestController extends Controller
 
     public function store(Request $request)
     {
-
         $deviceIdentifier = Cookie::get('device_identifier');
 
         if (!auth()->check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to submit the survey.');
+        }
+
+        // Validate the custom fields and survey data first to get visit_datetime
+        $request->validate([
+            'registration_type' => 'required|in:Individual,Group',
+            'visit_datetime' => 'required|date',
+            'cn_bus_number' => $request->registration_type === 'Group' ? 'required|string' : 'nullable|string',
+            'full_name' => 'required|string',
+            'address_affiliation' => 'required|string',
+            'nationality' => 'required|string',
+            'gender' => 'required|in:Male,Female',
+            // Demographics fields - only required for Group registration
+            'grade_school_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'high_school_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'college_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'pwd' => $request->registration_type === 'Group' ? 'required|string' : 'nullable|string',
+            'age_17_below' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'age_18_30' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'age_31_45' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'age_60_above' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+        ]);
+
+        // Check if there is an event on the selected visit date
+        $visitDate = Carbon::parse($request->input('visit_datetime'))->toDateString();
+        $eventExists = \App\Models\Event::whereDate('start_date', '<=', $visitDate)
+            ->whereDate('end_date', '>=', $visitDate)
+            ->exists();
+        if ($eventExists) {
+            return redirect()->back()->with('error', 'There is an event scheduled for your selected visit date. Please choose another date.');
         }
 
         $survey = $this->survey();
@@ -52,26 +80,6 @@ class GuestController extends Controller
         }
 
         Log::info($request->all());
-
-        // Validate the custom fields and survey data
-        $request->validate([
-            'registration_type' => 'required|in:Individual,Group',
-            'visit_datetime' => 'required|date',
-            'cn_bus_number' => $request->registration_type === 'Group' ? 'required|string' : 'nullable|string',
-            'full_name' => 'required|string',
-            'address_affiliation' => 'required|string',
-            'nationality' => 'required|string',
-            'gender' => 'required|in:Male,Female',
-            // Demographics fields - only required for Group registration
-            'grade_school_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'high_school_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'college_students' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'pwd' => $request->registration_type === 'Group' ? 'required|string' : 'nullable|string',
-            'age_17_below' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'age_18_30' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'age_31_45' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-            'age_60_above' => $request->registration_type === 'Group' ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
-        ]);
 
         // Create a new entry
         $entry = new Entry();
@@ -165,7 +173,7 @@ class GuestController extends Controller
             ]);
         }
 
-        return redirect()->route('landing.page')->with('success', 'Survey submitted successfully!');
+        return redirect()->route('guest.reservation.index')->with('success', 'Survey submitted successfully!');
     }
 
     protected function survey()

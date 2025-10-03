@@ -31,7 +31,7 @@
         <div class="row">
             <div class="col-6 top-head-left">
                 <ul>
-                    <li><a href="#">Visit Alberto Mansion</a></li>
+                    <li><a href="{{route('guest.survey.create')}}">Visit Alberto Mansion</a></li>
                 </ul>
             </div>
             <div class="col-6 top-head-right">

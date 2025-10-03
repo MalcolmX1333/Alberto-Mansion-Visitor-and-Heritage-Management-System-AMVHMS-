@@ -372,7 +372,7 @@
                     <p class="pt-20 pb-20 text-white">
                         A historical landmark showcasing the rich cultural heritage and history of Binan City, Laguna.
                     </p>
-                    <a href="#" class="primary-btn text-uppercase">Visit Now!</a>
+                    <a href="{{route('guest.survey.create')}}" class="primary-btn text-uppercase">Visit Now!</a>
                 </div>
             </div>
         </div>
